@@ -29,7 +29,7 @@ export default async function Home({ params }: Props) {
 
         return (
             <>
-                <main className="flex min-h-screen flex-col items-center gap-3 p-24">
+                <main className="flex min-h-screen flex-col items-center gap-3 p-4 md:p-24">
                     <Link href="/view/preset">Back</Link>
                     <h1 className="text-4xl font-bold">{data.title}</h1>
                     <div className="text-xl flex flex-col items-center gap-2">

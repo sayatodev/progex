@@ -50,6 +50,6 @@ export default function ProgramView({ program }: IProgramProps) {
     });
 
     return (
-        <div className="text-md font-mono flex flex-wrap">{tokenElements}</div>
+        <div className="text-md font-mono flex flex-wrap ml-[30px]">{tokenElements}</div>
     );
 }
