@@ -3,24 +3,23 @@ import Program from "@/helpers/program";
 import { Metadata } from "next";
 import Link from "next/link";
 
-export async function generateMetadata(
-  {params}: {params: { program_name: string }},
-): Promise<Metadata> {
-  return {
-    openGraph: {
-      title: "Progex - " + params.program_name,
-      description: "Progex - " + params.program_name,
-      url: "https://progex.com/view/preset/" + params.program_name,
-      siteName: "Progex", 
-    }
-  }
+interface Props {
+    params: Promise<{ program_name: string }>;
 }
 
-export default async function Home({
-    params,
-}: {
-    params: Promise<{ program_name: string }>;
-}) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { program_name } = await params;
+    return {
+        openGraph: {
+            title: "Progex - " + program_name,
+            description: "Progex - " + program_name,
+            url: "https://progex.com/view/preset/" + program_name,
+            siteName: "Progex",
+        },
+    };
+}
+
+export default async function Home({ params }: Props) {
     try {
         const { program_name } = await params;
         const data: ProgramData = await import(
