@@ -1,0 +1,113 @@
+{
+    "TOKENS": {
+        "NUMBER": {
+            "ONE": "1",
+            "TWO": "2",
+            "THREE": "3",
+            "FOUR": "4",
+            "FIVE": "5",
+            "SIX": "6",
+            "SEVEN": "7",
+            "EIGHT": "8",
+            "NINE": "9",
+            "ZERO": "0"
+        },
+        "SPECIAL": {
+            "DECIMAL": ".",
+            "EXPRESSION": "ᴇ",
+            "NEGATIVE": "﹣",
+            "COMMA": ",",
+            "M_PLUS": "M+",
+            "M_MINUS": "M-",
+            "TO_POLAR": "▶r∠θ",
+            "TO_COMPLEX": "▶a+b𝒾",
+            "RANDOM": "Ran#",
+            "SEMICOLON": ";",
+            "INPUT": "?",
+            "COLON": ":",
+            "DISPLAY": "◢"
+        },
+        "VARIABLE": {
+            "ANSWER": "Ans",
+            "A": "A",
+            "B": "B",
+            "C": "C",
+            "D": "D",
+            "X": "X",
+            "Y": "Y",
+            "M": "M"
+        },
+        "CONSTANT": {
+            "PI": "π",
+            "E": "𝓮"
+        },
+        "GENERAL": {
+            "EXECUTE": "EXE",
+            "DEGREE": "°"
+        },
+        "OPERATOR": {
+            "PLUS": "+",
+            "MINUS": "-",
+            "MULTIPLY": "×",
+            "DIVIDE": "÷",
+            "FRACTION": "┘",
+            "INVERSE": "⁻¹",
+            "SQUARE": "²",
+            "CUBE": "³",
+            "X_POWER": "^(",
+            "FACTORIAL": "!",
+            "COMPLEX_ARGUMENT": "∠",
+            "PERCENT": "%",
+            "PERMUTATION": "𝐏",
+            "COMBINATION": "𝐂",
+            "ASSIGN": "→"
+        },
+        "FUNCTION": {
+            "SQRT": "√(",
+            "LOG": "log(",
+            "LN": "ln(",
+            "SIN": "sin(",
+            "COS": "cos(",
+            "TAN": "tan(",
+            "CUBE_ROOT": "∛(",
+            "X_ROOT": "ˣ√(",
+            "TEN_X_POWER": "₁₀^(",
+            "E_X_POWER": "𝓮^(",
+            "ARC_SIN": "sin⁻¹(",
+            "ARC_COS": "cos⁻¹(",
+            "ARC_TAN": "tan⁻¹(",
+            "ABS": "Abs(",
+            "POLAR": "Pol(",
+            "REC": "Rec(",
+            "RND": "Rnd(",
+            "ARGUMENT": "arg(",
+            "CONJUGATE": "Conjg("
+        },
+        "BRACKET": {
+            "LEFT": "(",
+            "RIGHT": ")"
+        },
+        "LOGIC": {
+            "IF": "If",
+            "THEN": "Then",
+            "ELSE": "Else",
+            "IF_END": "IfEnd",
+            "FOR": "For",
+            "TO": "To",
+            "STEP": "Step",
+            "NEXT": "Next",
+            "BREAK": "Break",
+            "WHILE": "While",
+            "WHILE_END": "WhileEnd",
+            "GOTO": "Goto",
+            "LABEL": "Lbl",
+            "GTE": "≥",
+            "LTE": "≤",
+            "GT": ">",
+            "LT": "<",
+            "ARROW": "=>",
+            "EQ": "=",
+            "NEQ": "≠"
+        }
+    }
+}

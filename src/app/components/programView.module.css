@@ -1,0 +1,10 @@
+.byteCount {
+    font-size: 0.9em;
+    color: var(--text-color);
+    position: absolute;
+    left:0;
+    bottom: 3px;
+    transform: translate(-30px, 0);
+    z-index: -1;
+    display: inline-block;
+}
