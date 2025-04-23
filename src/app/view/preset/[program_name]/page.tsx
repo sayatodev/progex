@@ -1,6 +1,20 @@
 import ProgramView from "@/app/components/programView";
 import Program from "@/helpers/program";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export async function generateMetadata(
+  {params}: {params: { program_name: string }},
+): Promise<Metadata> {
+  return {
+    openGraph: {
+      title: "Progex - " + params.program_name,
+      description: "Progex - " + params.program_name,
+      url: "https://progex.com/view/preset/" + params.program_name,
+      siteName: "Progex", 
+    }
+  }
+}
 
 export default async function Home({
     params,
