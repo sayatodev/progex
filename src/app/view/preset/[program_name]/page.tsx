@@ -2,6 +2,7 @@ import ProgramView from "@/app/components/programView";
 import Program from "@/helpers/program";
 import { Metadata } from "next";
 import Link from "next/link";
+import { CopyProgramCodeButton } from "./copyCodeButton";
 
 interface Props {
     params: Promise<{ program_name: string }>;
@@ -33,10 +34,10 @@ export default async function Home({ params }: Props) {
                     <Link href="/view/preset">Back</Link>
                     <h1 className="text-4xl font-bold">{data.title}</h1>
                     <div className="text-xl flex flex-col items-center gap-2">
-                        <p>Byte Count: {program.getTokens().length}</p>
-                        <p>Mode: {Program.getModeName(data.mode)}</p>
+                        <p>{Program.getModeName(data.mode)} Mode / {program.getTokens().length} Bytes</p>
                     </div>
                     <ProgramView program={program} />
+                    <CopyProgramCodeButton code={program.code} />
                 </main>
             </>
         );
