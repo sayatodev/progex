@@ -2,5 +2,5 @@
     "title": "Determinant of a 3x3 Matrix",
     "description": "Calculate the determinant of a 3x3 matrix.",
     "mode": 1,
-    "program": "?→A:?→B:?→C:?→D:?→X:?→Y:?→M:BYM-MXC:?→M:Ans+DMC-MYA:?→M:Ans+AXM-MDB"
+    "program": "?→A:?→B:?→C:?→D:?→X:?→Y:?→M:BYM -MXC:?→M:Ans+DMC-MYA:?→M:Ans+AXM -MDB"
 }
