@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Footer from "./footer";
 
 export default function Home() {
   return (
@@ -8,6 +9,7 @@ export default function Home() {
         <Link href="/view/preset">
           <h2 className="text-2xl font-bold">-&gt; Preset Programs</h2>
         </Link>
+        <Footer />
       </main>
     </>
   );
