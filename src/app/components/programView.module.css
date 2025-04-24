@@ -7,5 +7,6 @@
     transform: translate(-30px, 0);
     z-index: -1;
     display: inline-block;
+    user-select: none;
 }
 

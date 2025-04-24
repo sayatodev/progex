@@ -66,7 +66,7 @@ export default function ProgramView({ program }: IProgramProps) {
                     <span className={styles.byteCount}>{index}</span>
                     <span className={getStyles(token)}>{token.value}</span>
                 </div>
-                <div className="z-3 whitespace-nowrap rounded bg-black px-2 py-1 text-white absolute mb-3 bottom-1/2 left-1/2 -translate-x-1/2 before:content-[''] before:absolute before:-translate-x-1/2 before:left-1/2 before:top-full before:border-4 before:border-transparent before:border-t-black opacity-0 group-hover:opacity-100 transition pointer-events-none group-focus:opacity-100">
+                <div className="z-3 whitespace-nowrap rounded bg-black px-2 py-1 text-white absolute mb-3 bottom-1/2 left-1/2 -translate-x-1/2 before:content-[''] before:absolute before:-translate-x-1/2 before:left-1/2 before:top-full before:border-4 before:border-transparent before:border-t-black opacity-0 group-hover:opacity-100 transition pointer-events-none group-focus:opacity-100 group-active:opacity-100">
                     <div className="text-sm">
                         <p className="font-sans font-bold">
                             {token.name}{" "}
