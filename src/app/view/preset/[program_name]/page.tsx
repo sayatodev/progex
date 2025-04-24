@@ -34,7 +34,7 @@ export default async function Home({ params }: Props) {
                     <h1 className="text-4xl font-bold">{data.title}</h1>
                     <div className="text-xl flex flex-col items-center gap-2">
                         <p>Byte Count: {program.getTokens().length}</p>
-                        <p>Mode: {data.mode}</p>
+                        <p>Mode: {Program.getModeName(data.mode)}</p>
                     </div>
                     <ProgramView program={program} />
                 </main>

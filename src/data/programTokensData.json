@@ -109,5 +109,236 @@
             "EQ": "=",
             "NEQ": "≠"
         }
+    },
+    "INPUTS": {
+        "NUMBER": {
+            "ONE": [{ "theme": "dark", "value": "1" }],
+            "TWO": [{ "theme": "dark", "value": "2" }],
+            "THREE": [{ "theme": "dark", "value": "3" }],
+            "FOUR": [{ "theme": "dark", "value": "4" }],
+            "FIVE": [{ "theme": "dark", "value": "5" }],
+            "SIX": [{ "theme": "dark", "value": "6" }],
+            "SEVEN": [{ "theme": "dark", "value": "7" }],
+            "EIGHT": [{ "theme": "dark", "value": "8" }],
+            "NINE": [{ "theme": "dark", "value": "9" }],
+            "ZERO": [{ "theme": "dark", "value": "0" }]
+        },
+        "SPECIAL": {
+            "DECIMAL": [{ "theme": "dark", "value": "." }],
+            "EXPRESSION": [{ "theme": "dark", "value": "EXP" }],
+            "NEGATIVE": [{ "theme": "dark", "value": "(-)" }],
+            "COMMA": [{ "theme": "light", "value": "," }],
+            "M_PLUS": [{ "theme": "light", "value": "M+" }],
+            "M_MINUS": [{ "theme": "light", "value": "M+" }],
+            "TO_POLAR": [{ "theme": "light", "value": "+" }],
+            "TO_COMPLEX": [{ "theme": "light", "value": "-" }],
+            "RANDOM": [{ "theme": "light", "value": "." }],
+            "SEMICOLON": [{ "theme": "light", "value": "," }],
+            "INPUT": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "dark", "value": "1" }
+            ],
+            "COLON": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "dark", "value": "3" }
+            ],
+            "DISPLAY": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "dark", "value": "4" }
+            ]
+        },
+        "VARIABLE": {
+            "ANSWER": [{ "theme": "dark", "value": "Ans" }],
+            "A": [{ "theme": "light", "value": "(-)" }],
+            "B": [{ "theme": "light", "value": "。，，，" }],
+            "C": [{ "theme": "light", "value": "hyp" }],
+            "D": [{ "theme": "light", "value": "sin" }],
+            "X": [{ "theme": "light", "value": ")" }],
+            "Y": [{ "theme": "light", "value": "," }],
+            "M": [{ "theme": "light", "value": "M+" }]
+        },
+        "CONSTANT": {
+            "PI": [{ "theme": "light", "value": "π" }],
+            "E": [{ "theme": "light", "value": "ln" }]
+        },
+        "GENERAL": {
+            "EXECUTE": [{ "theme": "dark", "value": "EXE" }],
+            "DEGREE": [{ "theme": "dark", "value": "。，，，" }]
+        },
+        "OPERATOR": {
+            "PLUS": [{ "theme": "dark", "value": "+" }],
+            "MINUS": [{ "theme": "dark", "value": "-" }],
+            "MULTIPLY": [{ "theme": "dark", "value": "×" }],
+            "DIVIDE": [{ "theme": "dark", "value": "÷" }],
+            "FRACTION": [{ "theme": "light", "value": "a b/c" }],
+            "INVERSE": [{ "theme": "light", "value": "x⁻¹" }],
+            "SQUARE": [{ "theme": "light", "value": "x²" }],
+            "CUBE": [{ "theme": "light", "value": "x³" }],
+            "X_POWER": [{ "theme": "light", "value": "^" }],
+            "FACTORIAL": [{ "theme": "light", "value": "x⁻¹" }],
+            "COMPLEX_ARGUMENT": [{ "theme": "light", "value": "(-)" }],
+            "PERCENT": [{ "theme": "light", "value": "(" }],
+            "PERMUTATION": [{ "theme": "dark", "value": "×" }],
+            "COMBINATION": [{ "theme": "dark", "value": "÷" }],
+            "ASSIGN": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "dark", "value": "2" }
+            ]
+        },
+        "FUNCTION": {
+            "SQRT": [{ "theme": "light", "value": "√" }],
+            "LOG": [{ "theme": "light", "value": "log" }],
+            "LN": [{ "theme": "light", "value": "ln" }],
+            "SIN": [{ "theme": "light", "value": "sin" }],  
+            "COS": [{ "theme": "light", "value": "cos" }],
+            "TAN": [{ "theme": "light", "value": "tan" }],
+            "CUBE_ROOT": [{ "theme": "light", "value": "x³" }],
+            "X_ROOT": [{ "theme": "light", "value": "^" }],
+            "TEN_X_POWER": [{ "theme": "light", "value": "log" }],
+            "E_X_POWER": [{ "theme": "light", "value": "ln" }],
+            "ARC_SIN": [{ "theme": "light", "value": "sin" }],
+            "ARC_COS": [{ "theme": "light", "value": "cos" }],
+            "ARC_TAN": [{ "theme": "light", "value": "tan" }],
+            "ABS": [{ "theme": "light", "value": ")" }],
+            "POLAR": [{ "theme": "dark", "value": "+" }],
+            "REC": [{ "theme": "dark", "value": "-" }],
+            "RND": [{ "theme": "dark", "value": "0" }],
+            "ARGUMENT": [{ "theme": "light", "value": "(" }],
+            "CONJUGATE": [{ "theme": "light", "value": "," }]
+        },
+        "BRACKET": {
+            "LEFT": [{ "theme": "light", "value": "(" }],
+            "RIGHT": [{ "theme": "light", "value": ")" }]
+        },
+        "LOGIC": {
+            "IF":  [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "THEN": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "ELSE": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "IF_END": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "FOR": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "TO": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "STEP": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "3" }
+            ],
+            "NEXT": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "BREAK": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "replay", "value": "←"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "WHILE": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "WHILE_END":[
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "GOTO": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "LABEL": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "GT": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "LT": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "GTE": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "3" }
+            ],
+            "LTE": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "4" }
+            ],
+            "ARROW": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "1" }
+            ],
+            "EQ":  [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "2" }
+            ],
+            "NEQ": [
+                { "theme": "orange", "value": "Prog" },
+                { "theme": "replay", "value": "→"},
+                { "theme": "dark", "value": "3" }
+            ]
+        }
     }
 }

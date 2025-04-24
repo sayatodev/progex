@@ -1,6 +1,6 @@
 {
     "title": "Cubic Equations",
     "description": "Solve cubic equations of the form Ax^3 + Bx^2 + Cx + D = 0.",
-    "mode": "CMPLX",
+    "mode": 2,
     "program": "?→A:?→B:?→C:?→D:9A(BC-3AD)┘2-B³→M:√(M²+(3AC-B²)³M+:IfAns=Conjg(Ans:Then∛(M)+∛(M -2Ans:Else2∛(Abs(M))cos(3⁻¹arg(M:IfEnd:(Ans-B)┘(3A◢-B┘A-Ans→M:M┘2:Ans+√(-3Ans²-BM┘A-C┘AM-◢M"
 }

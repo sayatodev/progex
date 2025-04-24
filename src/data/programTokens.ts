@@ -1,4 +1,4 @@
-import { TOKENS } from "../data/programTokensData.json";
+import { TOKENS, INPUTS } from "../data/programTokensData.json";
 
 const {
     // NUMBER,
@@ -24,8 +24,10 @@ export const PROGRAM_TOKEN_EXTENSIONS = {
         FUNCTION.ARC_COS,
         FUNCTION.ARC_TAN,
         OPERATOR.PERCENT,
+        FUNCTION.ARGUMENT,
         FUNCTION.ABS,
         SPECIAL.SEMICOLON,
+        FUNCTION.CONJUGATE,
         SPECIAL.M_MINUS,
         OPERATOR.PERMUTATION,
         OPERATOR.COMBINATION,
@@ -47,17 +49,6 @@ export const PROGRAM_TOKEN_EXTENSIONS = {
         VARIABLE.M,
     ],
 };
-
-export const PROGRAM_TOKEN_MODES = {
-    2: [
-        OPERATOR.COMPLEX_ARGUMENT,
-        FUNCTION.ARGUMENT,
-        FUNCTION.CONJUGATE,
-        SPECIAL.TO_COMPLEX,
-        SPECIAL.TO_POLAR,
-    ],
-};
-
 export const PROGRAM_MENU_TOKENS: Record<CalculatorMenuName, string[]> = {
     PROG: [
         SPECIAL.INPUT,
@@ -83,7 +74,7 @@ export const PROGRAM_MENU_TOKENS: Record<CalculatorMenuName, string[]> = {
         LOGIC.LT,
         LOGIC.ARROW,
         LOGIC.EQ,
-        LOGIC.NEQ
+        LOGIC.NEQ,
     ],
     CONST: [],
     S_SUM: [],
@@ -93,15 +84,33 @@ export const PROGRAM_MENU_TOKENS: Record<CalculatorMenuName, string[]> = {
     DRG: [],
 };
 
+export const PROGRAM_TOKEN_MODES = {
+    2: [
+        OPERATOR.COMPLEX_ARGUMENT,
+        FUNCTION.ARGUMENT,
+        FUNCTION.CONJUGATE,
+        SPECIAL.TO_COMPLEX,
+        SPECIAL.TO_POLAR,
+    ],
+    6: PROGRAM_MENU_TOKENS.PROG,
+};
+
 // All tokens
 function getAllTokens() {
     const result: ProgramTokenProps[] = [];
 
-    for (const [category, tokenMap] of Object.entries(TOKENS)) {
+    type TokenCategory = keyof typeof TOKENS;
+    for (const [category, tokenMap] of Object.entries(TOKENS) as Array<
+        [TokenCategory, (typeof TOKENS)[TokenCategory]]
+    >) {
         // Process each token in the category
-        for (const [name, value] of Object.entries(tokenMap)) {
+
+        for (const [name, value] of Object.entries(tokenMap) as Array<
+            [keyof typeof tokenMap, string]
+        >) {
             // Look for specific modes for the token
-            let mode = -1;
+
+            let mode = 0;
             for (const [modeNumber, tokens] of Object.entries(
                 PROGRAM_TOKEN_MODES
             )) {
@@ -128,6 +137,8 @@ function getAllTokens() {
                 alpha: PROGRAM_TOKEN_EXTENSIONS.ALPHA.includes(value),
                 mode,
                 parentMenu,
+                inputs:
+                    INPUTS[category]?.[name] ?? [],
             });
         }
     }

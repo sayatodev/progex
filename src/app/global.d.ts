@@ -2,7 +2,7 @@ interface ProgramData {
     title: string;
     description: string;
     program: string;
-    mode: "COMP" | "CMPLX" | "BASE" | "SD" | "REG"
+    mode: number;
 }
 
 interface ProgramLink {
@@ -15,7 +15,16 @@ interface ProgramToken {
     value: string;
 }
 
-type CalculatorMenuName = "PROG" | "CONST" | "S_SUM" | "S_VAR" | "MODE" | "CLR" | "DRG"
+type CalculatorMenuName =
+    | "PROG"
+    | "CONST"
+    | "S_SUM"
+    | "S_VAR"
+    | "MODE"
+    | "CLR"
+    | "DRG";
+
+type CalculatorInputTheme = "light" | "dark" | "orange" | "replay";
 
 interface ProgramTokenProps {
     value: string;
@@ -25,4 +34,5 @@ interface ProgramTokenProps {
     alpha: boolean;
     mode: number;
     parentMenu: string | null;
+    inputs: { theme: CalculatorInputTheme; value: string }[];
 }

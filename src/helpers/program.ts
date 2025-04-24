@@ -39,15 +39,7 @@ export default class Program {
                     code[cursor] === token.value || // For single character tokens
                     code.startsWith(token.value, cursor) // For multi-character tokens
                 ) {
-                    tokens.push({
-                        value: token.value,
-                        name: token.name,
-                        category: token.category,
-                        shift: token.shift,
-                        alpha: token.alpha,
-                        mode: token.mode,
-                        parentMenu: token.parentMenu,
-                    });
+                    tokens.push(token);
                     cursor += token.value.length;
                     matched = true;
                     break;
@@ -64,10 +56,33 @@ export default class Program {
                 alpha: false,
                 mode: -1,
                 parentMenu: null,
+                inputs: [],
             });
             cursor++;
         }
 
         return tokens;
+    }
+
+    static getModeName(mode: number|string): string {
+        mode = Number(mode); // Ensure mode is a number
+        switch (mode) {
+            case 0:
+                return "ANY";
+            case 1:
+                return "COMP";
+            case 2:
+                return "COMPLEX";
+            case 3:
+                return "BASE";
+            case 4:
+                return "SD";
+            case 5:
+                return "REG";
+            case 6:
+                return "PROG";
+            default:
+                return "UNKNOWN";
+        }
     }
 }
