@@ -36,7 +36,7 @@ export default function DebugPage() {
     );
 }
 
-export function LogsViewer({logCallback, debugCallback}: {logCallback?: (message: string) => void, debugCallback?: (message: string) => void}) {
+function LogsViewer({logCallback, debugCallback}: {logCallback?: (message: string) => void, debugCallback?: (message: string) => void}) {
     const [logs, setLogs] = useState<string[]>([]);
     console.log = (...messages) => {
         const logMessage = messages.join(" ");
