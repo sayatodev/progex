@@ -1,5 +1,5 @@
 {
-    "TOKENS": {
+    "SYMBOLS": {
         "NUMBER": {
             "ONE": "1",
             "TWO": "2",
@@ -39,7 +39,8 @@
         },
         "CONSTANT": {
             "PI": "π",
-            "E": "𝓮"
+            "E": "𝓮",
+            "I": "𝒾"
         },
         "GENERAL": {
             "EXECUTE": "EXE",
@@ -83,9 +84,9 @@
             "ARGUMENT": "arg(",
             "CONJUGATE": "Conjg("
         },
-        "BRACKET": {
-            "LEFT": "(",
-            "RIGHT": ")"
+        "PARENTHESIS": {
+            "LEFT_PARENTHESIS": "(",
+            "RIGHT_PARENTHESIS": ")"
         },
         "LOGIC": {
             "IF": "If",
@@ -206,7 +207,7 @@
             "ARGUMENT": [{ "theme": "light", "value": "(" }],
             "CONJUGATE": [{ "theme": "light", "value": "," }]
         },
-        "BRACKET": {
+        "PARENTHESIS": {
             "LEFT": [{ "theme": "light", "value": "(" }],
             "RIGHT": [{ "theme": "light", "value": ")" }]
         },

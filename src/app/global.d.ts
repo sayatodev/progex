@@ -10,7 +10,7 @@ interface ProgramLink {
     url: string;
 }
 
-interface ProgramToken {
+interface ProgramSymbol {
     type: string;
     value: string;
 }
@@ -25,14 +25,3 @@ type CalculatorMenuName =
     | "DRG";
 
 type CalculatorInputTheme = "light" | "dark" | "orange" | "replay";
-
-interface ProgramTokenProps {
-    value: string;
-    name: string;
-    category: string;
-    shift: boolean;
-    alpha: boolean;
-    mode: number;
-    parentMenu: string | null;
-    inputs: { theme: CalculatorInputTheme; value: string }[];
-}

@@ -1,19 +1,20 @@
-import Program from "@/helpers/program";
+import Program from "@/helpers/calprog/Program";
 import styles from "./programView.module.css";
+import ProgSymbol from "@/helpers/calprog/Symbol";
 
 const defaultClass =
     "z-2 inline-block m-1 px-2.5 py-0.5 rounded-md text-lg font-mono whitespace-pre-wrap break-word";
-const getStyles = (token: ProgramTokenProps) => {
+const getStyles = (symbol: ProgSymbol) => {
     const results = [defaultClass];
-    if (token.mode === 2) results.push("bg-purple-600 text-white");
-    if (token.mode === 3) results.push("bg-green-200 text-white");
-    if (token.mode === 4) results.push("bg-blue-200 text-white");
-    if (token.mode === 5)
+    if (symbol.mode === 2) results.push("bg-purple-600 text-white");
+    if (symbol.mode === 3) results.push("bg-green-200 text-white");
+    if (symbol.mode === 4) results.push("bg-blue-200 text-white");
+    if (symbol.mode === 5)
         results.push("bg-black text-white dark:bg-gray-800 dark:text-white");
-    if (token.parentMenu === "PROG") results.push("bg-orange-500 text-white");
+    if (symbol.parentMenu === "PROG") results.push("bg-orange-500 text-white");
 
-    if (token.shift) {
-        switch (token.mode) {
+    if (symbol.flags.shift) {
+        switch (symbol.mode) {
             case 2:
                 results.push("bg-purple-200 text-yellow-300");
                 break;
@@ -27,8 +28,8 @@ const getStyles = (token: ProgramTokenProps) => {
                 results.push("bg-yellow-600 text-white");
         }
     }
-    if (token.alpha) {
-        switch (token.mode) {
+    if (symbol.flags.alpha) {
+        switch (symbol.mode) {
             case 2:
                 results.push("bg-purple-200 text-red-300");
                 break;
@@ -58,41 +59,50 @@ interface IProgramProps {
 }
 
 export default function ProgramView({ program }: IProgramProps) {
-    const tokens = program.getTokens();
-    const tokenElements = tokens.map((token, index) => {
+    const symbols = program.getSymbols();
+    console.warn(symbols)
+    const symbolElements = symbols.map((symbol, index) => {
         return (
-            <div key={`token_${index}`} className="group relative">
+            <div key={`symbol_${index}`} className="group relative">
                 <div className="relative">
                     <span className={styles.byteCount}>{index}</span>
-                    <span className={getStyles(token)}>{token.value}</span>
+                    <span className={getStyles(symbol)}>{symbol.value}</span>
                 </div>
-                <div className="z-3 whitespace-nowrap rounded bg-black px-2 py-1 text-white absolute mb-3 bottom-1/2 left-1/2 -translate-x-1/2 before:content-[''] before:absolute before:-translate-x-1/2 before:left-1/2 before:top-full before:border-4 before:border-transparent before:border-t-black opacity-0 group-hover:opacity-100 transition pointer-events-none group-focus:opacity-100 group-active:opacity-100">
+                <div
+                    className={
+                        "z-3 whitespace-nowrap rounded bg-black px-2 py-1 text-white " +
+                        "absolute mb-3 bottom-1/2 left-1/2 -translate-x-1/2 " +
+                        "before:content-[''] before:absolute before:-translate-x-1/2 before:left-1/2 before:top-full " +
+                        "before:border-4 before:border-transparent before:border-t-black opacity-0 select-none " +
+                        "group-hover:opacity-100 transition pointer-events-none group-focus:opacity-100 group-active:opacity-100"
+                    }
+                >
                     <div className="text-sm">
                         <p className="font-sans font-bold">
-                            {token.name}{" "}
+                            {symbol.name}{" "}
                             <span className="text-xs font-normal italic">
-                                {token.category}
+                                {symbol.category}
                             </span>
                         </p>
-                        {token.mode !== undefined && (
+                        {symbol.mode !== undefined && (
                             <p className="text-xs font-sans">
-                                ({Program.getModeName(token.mode)}
+                                ({Program.getModeName(symbol.mode)}
                                 {" Mode"})
                             </p>
                         )}
-                        {token.inputs.length > 0 && (
+                        {symbol.inputs.length > 0 && (
                             <p>
-                                {token.shift && (
+                                {symbol.flags.shift && (
                                     <span className="text-xs mr-1 text-yellow-500">
                                         Shift
                                     </span>
                                 )}
-                                {token.alpha && (
+                                {symbol.flags.alpha && (
                                     <span className="text-xs mr-1 text-red-500">
                                         Alpha
                                     </span>
                                 )}
-                                {token.inputs.map((input, i) => (
+                                {symbol.inputs.map((input, i) => (
                                     <span
                                         key={i}
                                         className={`${defaultClass} text-xs mr-1 ml-0 px-2 ${
@@ -112,7 +122,7 @@ export default function ProgramView({ program }: IProgramProps) {
 
     return (
         <div className="text-md font-mono flex flex-wrap ml-[30px]">
-            {tokenElements}
+            {symbolElements}
         </div>
     );
 }

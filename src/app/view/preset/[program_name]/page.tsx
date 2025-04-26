@@ -1,5 +1,5 @@
 import ProgramView from "@/app/components/programView";
-import Program from "@/helpers/program";
+import Program from "@/helpers/calprog/Program";
 import { Metadata } from "next";
 import Link from "next/link";
 import { CopyProgramCodeButton } from "./copyCodeButton";
@@ -36,7 +36,7 @@ export default async function Home({ params }: Props) {
                 <div className="text-xl flex flex-col items-center gap-2">
                     <p>
                         {Program.getModeName(data.mode)} Mode /{" "}
-                        {program.getTokens().length} Bytes
+                        {program.getSymbols().length} Bytes
                     </p>
                 </div>
                 <ProgramView program={program} />
