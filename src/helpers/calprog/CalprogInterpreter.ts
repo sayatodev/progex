@@ -1,4 +1,4 @@
-import SYMBOLS from "@/data/programSymbolsData.json";
+import { PROGRAM_SYMBOLS } from "@/data/programSymbols";
 import ProgSymbol from "./Symbol";
 
 export default class CalprogInterpreter {
@@ -7,13 +7,13 @@ export default class CalprogInterpreter {
         let cursor = 0;
 
         // Sort symbol by length (longest first)
-        SYMBOLS.sort((a, b) => {
+        PROGRAM_SYMBOLS.sort((a, b) => {
             return b.value.length - a.value.length;
         });
 
         while (cursor < code.length) {
             let matched = false;
-            for (const symbol of SYMBOLS) {
+            for (const symbol of PROGRAM_SYMBOLS) {
                 if (code[cursor] === " ") {
                     cursor++;
                     matched = true;

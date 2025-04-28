@@ -1,4 +1,5 @@
-import SYMBOLS from "@/data/programSymbolsData.json";
+import { PROGRAM_SYMBOLS } from "@/data/programSymbols";
+
 
 export default class ProgSymbol<N extends string = string> {
     public name: N;
@@ -11,7 +12,7 @@ export default class ProgSymbol<N extends string = string> {
 
     public constructor(name: N) {
         this.name = name;
-        const symbol = SYMBOLS.find((t) => t.name === name);
+        const symbol = PROGRAM_SYMBOLS.find((t) => t.name === name);
         if (symbol) {
             this.value = symbol.value;
             this.category = symbol.category;
@@ -34,9 +35,9 @@ export default class ProgSymbol<N extends string = string> {
     }
 
     public static fromValue(
-        name: (typeof SYMBOLS)[number]["value"]
+        name: (typeof PROGRAM_SYMBOLS)[number]["value"]
     ): ProgSymbol {
-        const symbol = SYMBOLS.find((t) => t.value === name);
+        const symbol = PROGRAM_SYMBOLS.find((t) => t.value === name);
         if (symbol) {
             return new ProgSymbol(symbol.name as string);
         } else {

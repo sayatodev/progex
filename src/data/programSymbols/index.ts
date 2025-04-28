@@ -1,5 +1,7 @@
 import SymbolsData from "./generatedData";
 
+export const PROGRAM_SYMBOLS = SymbolsData;
+
 export const PROGRAM_SYMBOL_EXTENSIONS: Record<CalculatorFlag, string[]> = {
     SHIFT: SymbolsData.filter((symbol) => symbol.category === "SHIFT").map(
         (symbol) => symbol.name
