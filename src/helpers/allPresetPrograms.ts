@@ -1,7 +1,7 @@
 import fs from "node:fs";
 
 export default async function getAllPresetPrograms(): Promise<ProgramLink[]> {
-    const dir = "./src/data/preset_programs/";
+    const dir = "./src/data/presetPrograms/";
     const files = fs.readdirSync(dir);
     const programs = files.filter((file) => file.endsWith(".json"));
     const result = [];

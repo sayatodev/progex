@@ -25,7 +25,7 @@ export default async function Home({ params }: Props) {
     try {
         const { program_name } = await params;
         const data: ProgramData = await import(
-            "@/data/preset_programs/" + program_name + ".json"
+            "@/data/presetPrograms/" + program_name + ".json"
         );
         const program = new Program(data.program);
 

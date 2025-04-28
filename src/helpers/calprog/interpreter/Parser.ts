@@ -7,9 +7,15 @@ import {
     UnaryExpr,
     VariableExpr,
 } from "./Expr";
-import { DisplayStmt, ExpressionStmt, Stmt } from "./Stmt";
+import { AssignmentStmt, DisplayStmt, ExpressionStmt, Stmt } from "./Stmt";
 import Token from "./Token";
-import { EqualityOperator, UnaryOperator } from "./types";
+import {
+    EqualityOperator,
+    Identifier,
+    IdentifierName,
+    UnaryOperator,
+    VariableName,
+} from "./types";
 
 export default class Parser {
     private readonly tokens: Token[];
@@ -52,12 +58,12 @@ export default class Parser {
         return this.tokens[this.current - 1];
     }
 
-    private consume(
-        types: TokenType | Array<TokenType>,
+    private consume<T extends TokenType>(
+        types: T | T[],
         message: string
-    ): Token {
+    ): Token<T> {
         if (!Array.isArray(types)) types = [types];
-        if (this.check(...types)) return this.advance();
+        if (this.check(...types)) return this.advance() as Token<T>;
         throw this.create_error(this.peek(), message);
     }
 
@@ -67,22 +73,12 @@ export default class Parser {
         );
     }
 
-    private consumeStmt() {
-        const terminators = [
-            TokenType.COLON,
-            TokenType.DISPLAY,
-        ]
-        this.consume(terminators, "Expect statement terminator.");
-    }
-
     /* Parsing methods */
     private expression(): Expr {
-        console.debug("Parsing expression...");
         return this.equality();
     }
 
     private equality(): Expr {
-        console.debug("Parsing equality...");
         let expr = this.comparison();
 
         while (this.match(TokenType.EQ, TokenType.NEQ)) {
@@ -91,12 +87,10 @@ export default class Parser {
             expr = new BinaryExpr(expr, operator, right);
         }
 
-        console.debug("Parsed equality expression:", expr);
         return expr;
     }
 
     private comparison(): Expr {
-        console.debug("Parsing comparison...");
         let expr = this.term();
 
         while (
@@ -107,12 +101,10 @@ export default class Parser {
             expr = new BinaryExpr(expr, operator, right);
         }
 
-        console.debug("Parsed comparison expression:", expr);
         return expr;
     }
 
     private term(): Expr {
-        console.debug("Parsing term...");
         let expr = this.factor();
 
         while (this.match(TokenType.PLUS, TokenType.MINUS)) {
@@ -121,12 +113,10 @@ export default class Parser {
             expr = new BinaryExpr(expr, operator, right);
         }
 
-        console.debug("Parsed term expression:", expr);
         return expr;
     }
 
     private factor(): Expr {
-        console.debug("Parsing factor...");
         let expr = this.unary();
 
         while (
@@ -134,16 +124,13 @@ export default class Parser {
         ) {
             const operator = this.previous() as Token<EqualityOperator>;
             const right = this.unary();
-            console.debug("Parsed Factor", expr, operator, right);
             expr = new BinaryExpr(expr, operator, right);
         }
 
-        console.debug("Parsed factor expression:", expr);
         return expr;
     }
 
     private unary(): Expr {
-        console.debug("Parsing unary...");
         if (this.match(TokenType.MINUS, TokenType.PLUS, TokenType.NEGATIVE)) {
             const operator = this.previous() as Token<UnaryOperator>;
             const right = this.unary();
@@ -154,16 +141,27 @@ export default class Parser {
     }
 
     private primary(): Expr {
-        console.debug("Parsing primary...");
-
         if (this.match(TokenType.NUMBER)) {
-            console.debug("Parsed number:", this.previous().literal);
             return new NumberLiteralExpr(this.previous().literal as number);
         }
 
-        if (this.match(TokenType.VARIABLE) || this.match(TokenType.CONSTANT)) {
-            console.debug("Parsed variable:", this.previous().literal);
-            return new VariableExpr(this.previous());
+        if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
+            const identifier = this.previous() as Token<Identifier>;
+            let expr: Expr = new VariableExpr(
+                identifier,
+                identifier.lexeme as IdentifierName
+            );
+
+            // Handle chained variables or constants (e.g., AB = A*B)
+            while (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
+                const rightIdentifier = this.previous() as Token<Identifier>;
+                const right = new VariableExpr(
+                    rightIdentifier,
+                    rightIdentifier.lexeme as IdentifierName
+                );
+                expr = new BinaryExpr(expr, null, right);
+            }
+            return expr;
         }
 
         if (this.match(TokenType.LEFT_PARENTHESIS)) {
@@ -172,27 +170,51 @@ export default class Parser {
                 TokenType.RIGHT_PARENTHESIS,
                 "Expect ')' after expression."
             );
-            console.debug("Parsed grouping:", expr);
             return new GroupingExpr(expr);
         }
 
-        throw this.create_error(this.peek(), "Unexpected token.");
+        throw this.create_error(
+            this.peek(),
+            "Unexpected token for expression."
+        );
     }
 
     private statement(): Stmt {
-        console.debug("Parsing equality...");
         const expression = this.expression();
+        if (this.match(TokenType.ASSIGN)) {
+            const variable = this.consume(
+                TokenType.VARIABLE,
+                "Expect variable name." + this.current
+            ) as Token<Identifier, VariableName>; // Literal is a VariableName
+
+            if (this.isAtEnd()) {
+                return new AssignmentStmt(
+                    variable,
+                    expression,
+                    this.peek() as Token<TokenType.EOP>
+                );
+            }
+            
+            const terminator = this.consume(
+                [TokenType.COLON, TokenType.DISPLAY],
+                "Expect statement terminator."
+            );
+            return new AssignmentStmt(variable, expression, terminator);
+        }
 
         if (this.match(TokenType.DISPLAY)) {
-            return new DisplayStmt(expression);
+            return new DisplayStmt(new ExpressionStmt(expression));
         }
         if (this.match(TokenType.COLON)) {
+            return new ExpressionStmt(expression);
+        }
+        if (this.isAtEnd()) {
             return new ExpressionStmt(expression);
         }
 
         throw this.create_error(
             this.peek(),
-            "Expect statement terminator."
+            `Unexpected token #${this.peek().type} for statement.`
         );
     }
 

@@ -1,32 +1,51 @@
+import { SymbolValue } from "@/data/programSymbols/generatedEnums";
 import { TokenType } from "./enums";
 
 // Token types that are used in expressions
-export type TermOperator = 
-    | TokenType.PLUS
-    | TokenType.MINUS
+export type TermOperator = TokenType.PLUS | TokenType.MINUS;
 
 export type FactorOperator =
     | TokenType.MULTIPLY
     | TokenType.DIVIDE
-    | TokenType.FRACTION
+    | TokenType.FRACTION;
 
 export type ComparisonOperator =
     | TokenType.GT
     | TokenType.GTE
     | TokenType.LT
-    | TokenType.LTE
+    | TokenType.LTE;
 
-export type EqualityOperator =
-    | TokenType.EQ
-    | TokenType.NEQ
+export type EqualityOperator = TokenType.EQ | TokenType.NEQ;
 
 export type BinaryOperator =
     | TermOperator
     | FactorOperator
     | ComparisonOperator
-    | EqualityOperator
+    | EqualityOperator;
 
-export type UnaryOperator = TokenType.MINUS | TokenType.NEGATIVE | TokenType.PLUS;
+export type UnaryOperator =
+    | TokenType.MINUS
+    | TokenType.NEGATIVE
+    | TokenType.PLUS;
+
+export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
+export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;
+export type VariableName =
+    | SymbolValue.A
+    | SymbolValue.B
+    | SymbolValue.C
+    | SymbolValue.D
+    | SymbolValue.X
+    | SymbolValue.Y
+    | SymbolValue.M;
+export type ConstantName = SymbolValue.PI | SymbolValue.E;
+export type IdentifierName = VariableName | ConstantName | SymbolValue.ANSWER;
+
+export type Value = number;
 
 // Utility types
-export type ErrorName = "SyntaxError" | "RuntimeError" | "StackError" | "MathError"
+export type ErrorName =
+    | "SyntaxError"
+    | "RuntimeError"
+    | "StackError"
+    | "MathError";

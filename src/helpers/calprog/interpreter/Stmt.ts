@@ -1,6 +1,7 @@
 import { TokenType } from "./enums";
 import { type Expr } from "./Expr";
 import type Token from "./Token";
+import { Identifier, Terminator, VariableName } from "./types";
 
 export abstract class Stmt {
     abstract accept<R>(visitor: StmtVisitor<R>): R;
@@ -9,14 +10,14 @@ export abstract class Stmt {
 export interface StmtVisitor<R> {
     visitExpressionStmt(stmt: ExpressionStmt): R;
     visitDisplayStmt(stmt: DisplayStmt): R;
-    visitVarStmt(stmt: VarStmt): R;
+    visitAssignmentStmt(stmt: AssignmentStmt): R;
     visitIfStmt(stmt: IfStmt): R;
     visitWhileStmt(stmt: WhileStmt): R;
     visitGotoStmt(stmt: GotoStmt): R;
     visitLabelStmt(stmt: LabelStmt): R;
     visitForStmt(stmt: ForStmt): R;
 }
-    
+
 export class ExpressionStmt extends Stmt {
     expression: Expr;
 
@@ -31,10 +32,9 @@ export class ExpressionStmt extends Stmt {
 }
 
 export class DisplayStmt extends Stmt {
-    expression: Expr;
+    expression: ExpressionStmt;
 
-
-    constructor(expression: Expr) {
+    constructor(expression: ExpressionStmt) {
         super();
         this.expression = expression;
     }
@@ -44,21 +44,26 @@ export class DisplayStmt extends Stmt {
     }
 }
 
-export class VarStmt extends Stmt {
-    name: Token;
-    initializer: Expr | null;
+export class AssignmentStmt extends Stmt {
+    name: Token<Identifier, VariableName>;
+    initializer: Expr;
+    terminator: Token<Terminator>;
 
-    constructor(name: Token, initializer: Expr | null) {
+    constructor(
+        name: Token<Identifier, VariableName>,
+        initializer: Expr,
+        terminator: Token<Terminator>
+    ) {
         super();
         this.name = name;
         this.initializer = initializer;
+        this.terminator = terminator;
     }
 
     accept<R>(visitor: StmtVisitor<R>): R {
-        return visitor.visitVarStmt(this);
+        return visitor.visitAssignmentStmt(this);
     }
 }
-
 
 export class IfStmt extends Stmt {
     condition: Expr;

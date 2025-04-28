@@ -1,15 +1,19 @@
 import { type TokenType } from "./enums";
 
 export type Literal = number | string | null | undefined;
-export default class Token<T extends TokenType = TokenType> {
+export default class Token<
+    T extends TokenType = TokenType,
+    LexemeT = string,
+    LiteralT = Literal
+> {
     public readonly type: T;
-    public readonly lexeme: string;
-    public readonly literal: Literal;
+    public readonly lexeme: LexemeT;
+    public readonly literal: LiteralT;
     public readonly segment: number;
     public constructor(
         type: T,
-        lexeme: string,
-        literal: Literal,
+        lexeme: LexemeT,
+        literal: LiteralT,
         segment: number
     ) {
         this.type = type;

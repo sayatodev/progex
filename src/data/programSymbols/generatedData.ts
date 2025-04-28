@@ -1,4 +1,4 @@
-[
+const symbols = [
     {
         "value": "1",
         "name": "ONE",
@@ -1653,3 +1653,4 @@
         ]
     }
 ]
+export default symbols;

@@ -8,12 +8,11 @@ import type {
     LabelStmt,
     Stmt,
     StmtVisitor,
-    VarStmt,
+    AssignmentStmt,
     WhileStmt,
 } from "./Stmt";
 import { CalcSyntaxError, MathError, RuntimeError } from "./Errors";
 import type {
-    AssignExpr,
     BinaryExpr,
     Expr,
     GroupingExpr,
@@ -23,23 +22,35 @@ import type {
     ExprVisitor,
 } from "./Expr";
 import type Token from "./Token";
-import type { ErrorName } from "./types";
-
-type Value = number | null;
+import type { ErrorName, Value } from "./types";
+import { Environment } from "./Environment";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
+    private readonly environment: Environment = new Environment();
+
     constructor() {}
 
     private evaluate(expr: Expr): Value {
-        return expr.accept(this);
+        const result = expr.accept(this);
+        this.environment.result = result;
+        return result;
     }
 
     private execute(stmt: Stmt): void {
         stmt.accept(this);
     }
 
-    private error(name:ErrorName, token: Token, message: string): never {
+    private error(
+        name: ErrorName,
+        token: Token | null,
+        message: string
+    ): never {
         throw new RuntimeError(name, token, message);
+    }
+
+    private display(): void {
+        const result = this.environment.result;
+        console.log("DISPLAY->", result);
     }
 
     /* Checkers */
@@ -77,6 +88,13 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     visitBinaryExpr(expr: BinaryExpr): Value {
         const left = this.evaluate(expr.left);
         const right = this.evaluate(expr.right);
+
+        if (expr.operator === null) {
+            if (typeof left !== "number" || typeof right !== "number") {
+                throw new CalcSyntaxError(null, "Operands must be numbers.");
+            }
+            return left * right;
+        }
 
         this.checkNumberOperand(expr.operator, left);
         this.checkNumberOperand(expr.operator, right);
@@ -124,16 +142,16 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         }
     }
 
-    visitAssignExpr(expr: AssignExpr): Value {
-        void expr;
-        console.debug("Assigning", expr.name.lexeme, "to", expr.value);
-        throw new Error("Not implemented yet.");
-    }
-
     visitVariableExpr(expr: VariableExpr): Value {
-        void expr;
-        console.debug("Getting variable", expr.name.lexeme);
-        throw new Error("Not implemented yet.");
+        const value = this.environment.get(expr.identifier);
+        if (value === undefined) {
+            throw new RuntimeError(
+                "RuntimeError",
+                expr.name,
+                `Undefined variable ${expr.name.lexeme}.`
+            );
+        }
+        return value;
     }
 
     /* Stmt Visitors */
@@ -143,14 +161,16 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     }
 
     visitDisplayStmt(stmt: DisplayStmt): void {
-        const value = this.evaluate(stmt.expression);
-        console.log("DISPLAY->", value);
+        this.visitExpressionStmt(stmt.expression);
+        this.display();
     }
 
-    visitVarStmt(stmt: VarStmt): void {
-        const value = stmt.initializer ? this.evaluate(stmt.initializer) : null;
-        console.debug("Declaring variable", stmt.name.lexeme, "=", value);
-        throw new Error("Not implemented yet.");
+    visitAssignmentStmt(stmt: AssignmentStmt): void {
+        const result = this.evaluate(stmt.initializer);
+        this.environment.assign(stmt.name.lexeme, result);
+        if (stmt.terminator.type === TokenType.DISPLAY) {
+            this.display();
+        }
     }
 
     visitIfStmt(stmt: IfStmt): void {
@@ -191,6 +211,8 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
             } else if (error instanceof CalcSyntaxError) {
                 console.error(error.message);
             }
+        } finally {
+            this.display();
         }
     }
 }

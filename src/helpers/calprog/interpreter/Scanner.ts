@@ -1,7 +1,8 @@
-import { ALL_SYMBOLS, MAX_SYMBOL_LENGTH, SYMBOL_VALUES, SymbolValue } from "../../../data/programSymbols";
+import { SymbolValue } from "@/data/programSymbols/generatedEnums";
+import { MAX_SYMBOL_LENGTH } from "../../../data/programSymbols/index";
 import { TokenType } from "./enums";
 import Token, { Literal } from "./Token";
-
+import type { VariableName, ConstantName } from "./types";
 export default class Scanner {
     private readonly program: string;
     private readonly tokens: Token[] = [];
@@ -101,9 +102,7 @@ export default class Scanner {
     }
 
     private static error(segment: number, message: string): void {
-        throw new Error(
-            `Error at segment ${segment}, ${message}`
-        );
+        throw new Error(`Error at segment ${segment}, ${message}`);
     }
 
     private isAtEnd(): boolean {
@@ -112,42 +111,43 @@ export default class Scanner {
 
     private isDigit(c: string): boolean {
         switch (c) {
-            case SYMBOL_VALUES.NUMBER.ONE:
-            case SYMBOL_VALUES.NUMBER.TWO:
-            case SYMBOL_VALUES.NUMBER.THREE:
-            case SYMBOL_VALUES.NUMBER.FOUR:
-            case SYMBOL_VALUES.NUMBER.FIVE:
-            case SYMBOL_VALUES.NUMBER.SIX:
-            case SYMBOL_VALUES.NUMBER.SEVEN:
-            case SYMBOL_VALUES.NUMBER.EIGHT:
-            case SYMBOL_VALUES.NUMBER.NINE:
-            case SYMBOL_VALUES.NUMBER.ZERO:
+            case SymbolValue.ONE:
+            case SymbolValue.TWO:
+            case SymbolValue.THREE:
+            case SymbolValue.FOUR:
+            case SymbolValue.FIVE:
+            case SymbolValue.SIX:
+            case SymbolValue.SEVEN:
+            case SymbolValue.EIGHT:
+            case SymbolValue.NINE:
+            case SymbolValue.ZERO:
                 return true;
             default:
                 return false;
         }
     }
 
-    private isVariable(c: string): boolean {
+    private isVariable(c: string): c is VariableName {
         switch (c) {
-            case SYMBOL_VALUES.VARIABLE.A:
-            case SYMBOL_VALUES.VARIABLE.B:
-            case SYMBOL_VALUES.VARIABLE.C:
-            case SYMBOL_VALUES.VARIABLE.D:
-            case SYMBOL_VALUES.VARIABLE.X:
-            case SYMBOL_VALUES.VARIABLE.M:
-            case SYMBOL_VALUES.VARIABLE.ANSWER:
+            case SymbolValue.A:
+            case SymbolValue.B:
+            case SymbolValue.C:
+            case SymbolValue.D:
+            case SymbolValue.X:
+            case SymbolValue.Y:
+            case SymbolValue.M:
+            case SymbolValue.ANSWER:
                 return true;
             default:
                 return false;
         }
     }
 
-    private isConstant(c: string): boolean {
+    private isConstant(c: string): c is ConstantName {
         switch (c) {
-            case SYMBOL_VALUES.CONSTANT.PI:
-            case SYMBOL_VALUES.CONSTANT.E:
-            case SYMBOL_VALUES.CONSTANT.I:
+            case SymbolValue.PI:
+            case SymbolValue.E:
+            case SymbolValue.I:
                 return true;
             default:
                 return false;
@@ -163,7 +163,7 @@ export default class Scanner {
 
         for (let i = MAX_SYMBOL_LENGTH - 1; i >= 0; i--) {
             const symbol = i ? c + this.peek(i) : c;
-            if (ALL_SYMBOLS.includes(symbol as SymbolValue)) {
+            if (Object.values<string>(SymbolValue).includes(symbol)) {
                 matched_symbol = symbol as SymbolValue;
                 this.current += i; // Move the current index forward by the length of the symbol
                 break;
@@ -171,28 +171,34 @@ export default class Scanner {
         }
 
         if (matched_symbol === null) {
-            Scanner.error(this.segment, `Unexpected character: ${c + this.peek(4)}`);
+            Scanner.error(
+                this.segment,
+                `Unexpected character: ${c + this.peek(4)}`
+            );
             return;
         }
 
         const tokenType = this.typesMap.get(matched_symbol);
         if (tokenType) {
             this.addToken(tokenType);
+            if (tokenType === TokenType.COLON) {
+                this.segment++;
+            }
         } else {
             if (matched_symbol.length === 1) {
                 const isDecimalStartingNumber =
-                    c === SYMBOL_VALUES.SPECIAL.DECIMAL &&
-                    this.isDigit(this.peek());
+                    c === SymbolValue.DECIMAL && this.isDigit(this.peek());
 
                 if (this.isDigit(c) || isDecimalStartingNumber) {
                     this.scanNumber();
-                } else if (this.isVariable(c)) {
-                    this.addToken(TokenType.VARIABLE, c);
-                } else if (this.isConstant(c)) {
-                    this.addToken(TokenType.CONSTANT, c);
-                } else if (this.peek() === SYMBOL_VALUES.SPECIAL.COLON) {
-                    this.segment++;
                 }
+            }
+
+            // Variables and Constants (Might have multiple characters)
+            if (this.isVariable(c)) {
+                this.addToken(TokenType.VARIABLE, c);
+            } else if (this.isConstant(c)) {
+                this.addToken(TokenType.CONSTANT, c);
             }
         }
     }
@@ -216,7 +222,7 @@ export default class Scanner {
 
     private scanNumber(): void {
         while (this.isDigit(this.peek())) this.advance();
-        if (this.peek() === SYMBOL_VALUES.SPECIAL.DECIMAL) {
+        if (this.peek() === SymbolValue.DECIMAL) {
             this.advance(); // consume the decimal point
             while (this.isDigit(this.peek())) this.advance();
         }

@@ -1,5 +1,10 @@
 import Token from "./Token";
-import type { BinaryOperator, UnaryOperator } from "./types";
+import type {
+    BinaryOperator,
+    Identifier,
+    IdentifierName,
+    UnaryOperator,
+} from "./types";
 
 export abstract class Expr {
     abstract accept<R>(visitor: ExprVisitor<R>): R;
@@ -7,7 +12,6 @@ export abstract class Expr {
 }
 
 export interface ExprVisitor<R> {
-    visitAssignExpr(expr: AssignExpr): R;
     visitBinaryExpr(expr: BinaryExpr): R;
     visitGroupingExpr(expr: GroupingExpr): R;
     visitNumberExpr(expr: NumberLiteralExpr): R;
@@ -15,31 +19,12 @@ export interface ExprVisitor<R> {
     visitVariableExpr(expr: VariableExpr): R;
 }
 
-export class AssignExpr extends Expr {
-    name: Token;
-    value: Expr;
-
-    constructor(name: Token, value: Expr) {
-        super();
-        this.name = name;
-        this.value = value;
-    }
-
-    accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitAssignExpr(this);
-    }
-
-    toString(): string {
-        return `(Assign ${this.name.lexeme} = ${this.value.toString()})`;
-    }
-}
-
 export class BinaryExpr extends Expr {
     left: Expr;
-    operator: Token<BinaryOperator>;
+    operator: Token<BinaryOperator> | null; // Null would mean multiplication
     right: Expr;
 
-    constructor(left: Expr, operator: Token<BinaryOperator>, right: Expr) {
+    constructor(left: Expr, operator: Token<BinaryOperator> | null, right: Expr) {
         super();
         this.left = left;
         this.operator = operator;
@@ -52,7 +37,7 @@ export class BinaryExpr extends Expr {
 
     toString(): string {
         return `(Binary ${this.left.toString()} ${
-            this.operator.lexeme
+            this.operator?.lexeme ?? "null"
         } ${this.right.toString()})`;
     }
 }
@@ -111,11 +96,13 @@ export class UnaryExpr extends Expr {
 }
 
 export class VariableExpr extends Expr {
-    name: Token;
+    name: Token<Identifier>;
+    identifier: IdentifierName;
 
-    constructor(name: Token) {
+    constructor(name: Token<Identifier>, identifier: IdentifierName) {
         super();
         this.name = name;
+        this.identifier = identifier;
     }
 
     accept<R>(visitor: ExprVisitor<R>): R {

@@ -24,4 +24,6 @@ type CalculatorMenuName =
     | "CLR"
     | "DRG";
 
+type CalculatorFlag = "SHIFT" | "ALPHA";
+
 type CalculatorInputTheme = "light" | "dark" | "orange" | "replay";
