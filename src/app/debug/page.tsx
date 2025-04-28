@@ -4,6 +4,13 @@ import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
 import { useState } from "react";
 
+export function getStaticProps() {
+    return {
+        // Return 404 in production build
+        notfound: process.env.NODE_ENV === "production",
+    }
+}
+
 function debug() {
     const program = "5×-44×(B×C)×(π┘2)";
     console.log("Parsing", program);
