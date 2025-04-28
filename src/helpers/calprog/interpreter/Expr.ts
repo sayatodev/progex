@@ -1,16 +1,16 @@
 import Token from "./Token";
+import type { BinaryOperator, UnaryOperator } from "./types";
 
 export abstract class Expr {
     abstract accept<R>(visitor: Visitor<R>): R;
     abstract toString(): string;
 }
 
-interface Visitor<R> {
+export interface Visitor<R> {
     visitAssignExpr(expr: Assign): R;
     visitBinaryExpr(expr: Binary): R;
     visitGroupingExpr(expr: Grouping): R;
     visitNumberExpr(expr: NumberLiteral): R;
-    visitLogicalExpr(expr: Logical): R;
     visitUnaryExpr(expr: Unary): R;
     visitVariableExpr(expr: Variable): R;
 }
@@ -36,10 +36,10 @@ export class Assign extends Expr {
 
 export class Binary extends Expr {
     left: Expr;
-    operator: Token;
+    operator: Token<BinaryOperator>;
     right: Expr;
 
-    constructor(left: Expr, operator: Token, right: Expr) {
+    constructor(left: Expr, operator: Token<BinaryOperator>, right: Expr) {
         super();
         this.left = left;
         this.operator = operator;
@@ -51,7 +51,9 @@ export class Binary extends Expr {
     }
 
     toString(): string {
-        return `(Binary ${this.left.toString()} ${this.operator.lexeme} ${this.right.toString()})`;
+        return `(Binary ${this.left.toString()} ${
+            this.operator.lexeme
+        } ${this.right.toString()})`;
     }
 }
 
@@ -89,31 +91,11 @@ export class NumberLiteral extends Expr {
     }
 }
 
-export class Logical extends Expr {
-    left: Expr;
-    operator: Token;
-    right: Expr;
-
-    constructor(left: Expr, operator: Token, right: Expr) {
-        super();
-        this.left = left;
-        this.operator = operator;
-        this.right = right;
-    }
-
-    accept<R>(visitor: Visitor<R>): R {
-        return visitor.visitLogicalExpr(this);
-    }
-
-    toString(): string {
-        return `(Logical ${this.left.toString()} ${this.operator.lexeme} ${this.right.toString()})`;
-    }
-}
 export class Unary extends Expr {
-    operator: Token;
+    operator: Token<UnaryOperator>;
     right: Expr;
 
-    constructor(operator: Token, right: Expr) {
+    constructor(operator: Token<UnaryOperator>, right: Expr) {
         super();
         this.operator = operator;
         this.right = right;
@@ -124,7 +106,7 @@ export class Unary extends Expr {
     }
 
     toString(): string {
-            return `(Unary ${this.operator.lexeme} ${this.right.toString()})`;
+        return `(Unary ${this.operator.lexeme} ${this.right.toString()})`;
     }
 }
 

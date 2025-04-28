@@ -1,6 +1,7 @@
 import { TokenType } from "./enums";
 import { Expr, Binary, Grouping, NumberLiteral, Unary, Variable } from "./Expr";
 import Token from "./Token";
+import { EqualityOperator, UnaryOperator } from "./types";
 
 export default class Parser {
     private readonly tokens: Token[];
@@ -65,7 +66,7 @@ export default class Parser {
         let expr = this.comparison();
 
         while (this.match(TokenType.EQ, TokenType.NEQ)) {
-            const operator = this.previous();
+            const operator = this.previous() as Token<EqualityOperator>;
             const right = this.comparison();
             expr = new Binary(expr, operator, right);
         }
@@ -81,7 +82,7 @@ export default class Parser {
         while (
             this.match(TokenType.GT, TokenType.GTE, TokenType.LT, TokenType.LTE)
         ) {
-            const operator = this.previous();
+            const operator = this.previous() as Token<EqualityOperator>;
             const right = this.term();
             expr = new Binary(expr, operator, right);
         }
@@ -95,7 +96,7 @@ export default class Parser {
         let expr = this.factor();
 
         while (this.match(TokenType.PLUS, TokenType.MINUS)) {
-            const operator = this.previous();
+            const operator = this.previous() as Token<EqualityOperator>;
             const right = this.factor();
             expr = new Binary(expr, operator, right);
         }
@@ -109,7 +110,7 @@ export default class Parser {
         let expr = this.unary();
 
         while (this.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION)) {
-            const operator = this.previous();
+            const operator = this.previous() as Token<EqualityOperator>;
             const right = this.unary();
             console.debug("Parsed Factor", expr, operator, right);
             expr = new Binary(expr, operator, right);
@@ -121,8 +122,8 @@ export default class Parser {
 
     private unary(): Expr {
         console.debug("Parsing unary...");
-        if (this.match(TokenType.MINUS, TokenType.PLUS)) {
-            const operator = this.previous();
+        if (this.match(TokenType.MINUS, TokenType.PLUS, TokenType.NEGATIVE)) {
+            const operator = this.previous() as Token<UnaryOperator>;
             const right = this.unary();
             return new Unary(operator, right);
         }
