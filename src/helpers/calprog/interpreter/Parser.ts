@@ -1,5 +1,13 @@
 import { TokenType } from "./enums";
-import { Expr, Binary, Grouping, NumberLiteral, Unary, Variable } from "./Expr";
+import {
+    Expr,
+    BinaryExpr,
+    GroupingExpr,
+    NumberLiteralExpr,
+    UnaryExpr,
+    VariableExpr,
+} from "./Expr";
+import { DisplayStmt, ExpressionStmt, Stmt } from "./Stmt";
 import Token from "./Token";
 import { EqualityOperator, UnaryOperator } from "./types";
 
@@ -22,9 +30,9 @@ export default class Parser {
         return false;
     }
 
-    private check(type: TokenType): boolean {
+    private check(...types: TokenType[]): boolean {
         if (this.isAtEnd()) return false;
-        return this.peek().type === type;
+        return types.includes(this.peek().type);
     }
 
     private advance(): Token {
@@ -44,8 +52,12 @@ export default class Parser {
         return this.tokens[this.current - 1];
     }
 
-    private consume(type: TokenType, message: string): Token {
-        if (this.check(type)) return this.advance();
+    private consume(
+        types: TokenType | Array<TokenType>,
+        message: string
+    ): Token {
+        if (!Array.isArray(types)) types = [types];
+        if (this.check(...types)) return this.advance();
         throw this.create_error(this.peek(), message);
     }
 
@@ -53,6 +65,14 @@ export default class Parser {
         return new Error(
             `Error at ${token.segment}: ${message} (${token.lexeme})`
         );
+    }
+
+    private consumeStmt() {
+        const terminators = [
+            TokenType.COLON,
+            TokenType.DISPLAY,
+        ]
+        this.consume(terminators, "Expect statement terminator.");
     }
 
     /* Parsing methods */
@@ -68,7 +88,7 @@ export default class Parser {
         while (this.match(TokenType.EQ, TokenType.NEQ)) {
             const operator = this.previous() as Token<EqualityOperator>;
             const right = this.comparison();
-            expr = new Binary(expr, operator, right);
+            expr = new BinaryExpr(expr, operator, right);
         }
 
         console.debug("Parsed equality expression:", expr);
@@ -84,7 +104,7 @@ export default class Parser {
         ) {
             const operator = this.previous() as Token<EqualityOperator>;
             const right = this.term();
-            expr = new Binary(expr, operator, right);
+            expr = new BinaryExpr(expr, operator, right);
         }
 
         console.debug("Parsed comparison expression:", expr);
@@ -98,7 +118,7 @@ export default class Parser {
         while (this.match(TokenType.PLUS, TokenType.MINUS)) {
             const operator = this.previous() as Token<EqualityOperator>;
             const right = this.factor();
-            expr = new Binary(expr, operator, right);
+            expr = new BinaryExpr(expr, operator, right);
         }
 
         console.debug("Parsed term expression:", expr);
@@ -109,11 +129,13 @@ export default class Parser {
         console.debug("Parsing factor...");
         let expr = this.unary();
 
-        while (this.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION)) {
+        while (
+            this.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION)
+        ) {
             const operator = this.previous() as Token<EqualityOperator>;
             const right = this.unary();
             console.debug("Parsed Factor", expr, operator, right);
-            expr = new Binary(expr, operator, right);
+            expr = new BinaryExpr(expr, operator, right);
         }
 
         console.debug("Parsed factor expression:", expr);
@@ -125,9 +147,9 @@ export default class Parser {
         if (this.match(TokenType.MINUS, TokenType.PLUS, TokenType.NEGATIVE)) {
             const operator = this.previous() as Token<UnaryOperator>;
             const right = this.unary();
-            return new Unary(operator, right);
+            return new UnaryExpr(operator, right);
         }
-        
+
         return this.primary();
     }
 
@@ -136,12 +158,12 @@ export default class Parser {
 
         if (this.match(TokenType.NUMBER)) {
             console.debug("Parsed number:", this.previous().literal);
-            return new NumberLiteral(this.previous().literal as number);
+            return new NumberLiteralExpr(this.previous().literal as number);
         }
 
         if (this.match(TokenType.VARIABLE) || this.match(TokenType.CONSTANT)) {
             console.debug("Parsed variable:", this.previous().literal);
-            return new Variable(this.previous());
+            return new VariableExpr(this.previous());
         }
 
         if (this.match(TokenType.LEFT_PARENTHESIS)) {
@@ -151,19 +173,35 @@ export default class Parser {
                 "Expect ')' after expression."
             );
             console.debug("Parsed grouping:", expr);
-            return new Grouping(expr);
+            return new GroupingExpr(expr);
         }
 
         throw this.create_error(this.peek(), "Unexpected token.");
     }
 
-    /* Entry point for parsing */
-    public parse(): Expr | null {
-        try {
-            return this.expression();
-        } catch (error) {
-            console.error(error);
-            return null;
+    private statement(): Stmt {
+        console.debug("Parsing equality...");
+        const expression = this.expression();
+
+        if (this.match(TokenType.DISPLAY)) {
+            return new DisplayStmt(expression);
         }
+        if (this.match(TokenType.COLON)) {
+            return new ExpressionStmt(expression);
+        }
+
+        throw this.create_error(
+            this.peek(),
+            "Expect statement terminator."
+        );
+    }
+
+    /* Entry point for parsing */
+    public parse(): Stmt[] {
+        const statements = [];
+        while (!this.isAtEnd()) {
+            statements.push(this.statement());
+        }
+        return statements;
     }
 }

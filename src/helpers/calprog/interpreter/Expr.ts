@@ -2,20 +2,20 @@ import Token from "./Token";
 import type { BinaryOperator, UnaryOperator } from "./types";
 
 export abstract class Expr {
-    abstract accept<R>(visitor: Visitor<R>): R;
+    abstract accept<R>(visitor: ExprVisitor<R>): R;
     abstract toString(): string;
 }
 
-export interface Visitor<R> {
-    visitAssignExpr(expr: Assign): R;
-    visitBinaryExpr(expr: Binary): R;
-    visitGroupingExpr(expr: Grouping): R;
-    visitNumberExpr(expr: NumberLiteral): R;
-    visitUnaryExpr(expr: Unary): R;
-    visitVariableExpr(expr: Variable): R;
+export interface ExprVisitor<R> {
+    visitAssignExpr(expr: AssignExpr): R;
+    visitBinaryExpr(expr: BinaryExpr): R;
+    visitGroupingExpr(expr: GroupingExpr): R;
+    visitNumberExpr(expr: NumberLiteralExpr): R;
+    visitUnaryExpr(expr: UnaryExpr): R;
+    visitVariableExpr(expr: VariableExpr): R;
 }
 
-export class Assign extends Expr {
+export class AssignExpr extends Expr {
     name: Token;
     value: Expr;
 
@@ -25,7 +25,7 @@ export class Assign extends Expr {
         this.value = value;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitAssignExpr(this);
     }
 
@@ -34,7 +34,7 @@ export class Assign extends Expr {
     }
 }
 
-export class Binary extends Expr {
+export class BinaryExpr extends Expr {
     left: Expr;
     operator: Token<BinaryOperator>;
     right: Expr;
@@ -46,7 +46,7 @@ export class Binary extends Expr {
         this.right = right;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitBinaryExpr(this);
     }
 
@@ -57,7 +57,7 @@ export class Binary extends Expr {
     }
 }
 
-export class Grouping extends Expr {
+export class GroupingExpr extends Expr {
     expression: Expr;
 
     constructor(expression: Expr) {
@@ -65,7 +65,7 @@ export class Grouping extends Expr {
         this.expression = expression;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitGroupingExpr(this);
     }
 
@@ -74,7 +74,7 @@ export class Grouping extends Expr {
     }
 }
 
-export class NumberLiteral extends Expr {
+export class NumberLiteralExpr extends Expr {
     value: number;
 
     constructor(value: number) {
@@ -82,7 +82,7 @@ export class NumberLiteral extends Expr {
         this.value = value;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitNumberExpr(this);
     }
 
@@ -91,7 +91,7 @@ export class NumberLiteral extends Expr {
     }
 }
 
-export class Unary extends Expr {
+export class UnaryExpr extends Expr {
     operator: Token<UnaryOperator>;
     right: Expr;
 
@@ -101,7 +101,7 @@ export class Unary extends Expr {
         this.right = right;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitUnaryExpr(this);
     }
 
@@ -110,7 +110,7 @@ export class Unary extends Expr {
     }
 }
 
-export class Variable extends Expr {
+export class VariableExpr extends Expr {
     name: Token;
 
     constructor(name: Token) {
@@ -118,7 +118,7 @@ export class Variable extends Expr {
         this.name = name;
     }
 
-    accept<R>(visitor: Visitor<R>): R {
+    accept<R>(visitor: ExprVisitor<R>): R {
         return visitor.visitVariableExpr(this);
     }
 

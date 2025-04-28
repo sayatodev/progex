@@ -8,20 +8,21 @@ import { useEffect, useState } from "react";
 
 function debug() {
     // const program = "5×-44×(B×C)×(π┘2)";
-    const program = "5×-44×(.5┘2)";
+    const program = "278-49:-37×-45◢5×-44×(.5┘2)◢";
     console.log("Parsing", program);
+
     const tokens = new Scanner(program).scan();
-    console.log("Tokens:", tokens);
+    
     const parser = new Parser(tokens);
     const expression = parser.parse();
-    console.log(`${expression}`);
+    
     if (!expression) {
         console.debug("No expression found.");
         throw new Error("No expression found.");
     }
     const interpreter = new Interpreter();
-    const result = interpreter.interpret(expression);
-    console.log("Result:", result);
+    interpreter.interpret(expression);
+    
     console.log("Debugging complete.");
 }
 
@@ -63,14 +64,24 @@ function LogsViewer({
     const [logs, setLogs] = useState<string[]>([]);
     const [level, setLevel] = useState<"log" | "debug">("log");
     console.log = (...messages) => {
-        const logMessage = messages.join(" ");
+        const logMessage = messages
+            .map((m) =>
+                typeof m === "object" ? JSON.stringify(m, null, 4) : m
+            )
+            .join(" ");
         setLogs((prevLogs: string[]) => [...prevLogs, logMessage]);
-        logCallback?.(logMessage);
+        // @ts-expect-error Just a workaround for the type error, spread every argument back into the callback.
+        logCallback?.(...messages);
     };
     console.debug = (...messages) => {
-        const logMessage = messages.join(" ");
+        const logMessage = messages
+            .map((m) =>
+                typeof m === "object" ? JSON.stringify(m, null, 4) : m
+            )
+            .join(" ");
         setLogs((prevLogs: string[]) => [...prevLogs, "[DEBUG] " + logMessage]);
-        debugCallback?.(logMessage);
+        // @ts-expect-error Just a workaround for the type error, spread every argument back into the callback.
+        debugCallback?.(...messages);
     };
     useEffect(() => {
         setLogs([]); // Clear logs on mount
@@ -99,12 +110,12 @@ function LogsViewer({
                         return true;
                     })
                     .map((log, index) => (
-                        <p
+                        <pre
                             key={index}
                             className="text-gray-800 dark:text-white"
                         >
                             {log}
-                        </p>
+                        </pre>
                     ))}
             </div>
         </div>

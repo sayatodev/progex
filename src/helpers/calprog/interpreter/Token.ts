@@ -1,4 +1,4 @@
-import { TokenType } from "./enums";
+import { type TokenType } from "./enums";
 
 export type Literal = number | string | null | undefined;
 export default class Token<T extends TokenType = TokenType> {
