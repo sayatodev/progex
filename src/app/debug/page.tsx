@@ -4,10 +4,14 @@ import { RuntimeError } from "@/helpers/calprog/interpreter/Errors";
 import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
 import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
+import { Value } from "@/helpers/calprog/interpreter/Value";
 import { useEffect, useState } from "react";
 
 function debug(program: string, inputs: string[] = []) {
     console.clear();
+
+    window.Value = Value;
+
     for (const input of inputs) {
         program = program.replace("?", input);
     }
@@ -38,7 +42,9 @@ export default function DebugPage() {
     );
     const [inputs, setInputs] = useState<string[]>([]);
 
-    useEffect(() => debug(program, inputs), [program, inputs]);
+    useEffect(() => {
+        debug(program, inputs);
+    }, [program, inputs]);
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-100 dark:bg-gray-900">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-white">

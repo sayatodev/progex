@@ -28,6 +28,7 @@ import {
     SignedOperator,
     VariableName,
 } from "./types";
+import { Value } from "./Value";
 
 const FUNCTIONS = [
     ...[TokenType.ABS, TokenType.POLAR],
@@ -263,15 +264,15 @@ export default class Parser {
 
     private primary(): Expr {
         if (this.match(TokenType.NUMBER)) {
-            const literal = this.previous().literal as number;
+            const literal = this.previous().literal as Value;
             if (this.match(TokenType.EXP)) {
                 const exponent = this.consume(
                     TokenType.NUMBER,
                     "Expect exponent after EXP"
                 );
-                return new ExponentialExpr(literal, exponent.literal as number);
+                return new ExponentialExpr(literal, exponent.literal as Value);
             }
-            return new NumberLiteralExpr(literal as number);
+            return new NumberLiteralExpr(literal);
         }
 
         if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {

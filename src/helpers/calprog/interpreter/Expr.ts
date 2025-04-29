@@ -7,6 +7,7 @@ import type {
     SignedOperator,
     UnaryOperator,
 } from "./types";
+import { Value } from "./Value";
 
 export abstract class Expr {
     abstract accept<R>(visitor: ExprVisitor<R>): R;
@@ -107,9 +108,9 @@ export class GroupingExpr extends Expr {
 }
 
 export class ExponentialExpr extends Expr {
-    factor: number;
-    exponent: number;
-    constructor(factor: number, exponent: number) {
+    factor: Value;
+    exponent: Value;
+    constructor(factor: Value, exponent: Value) {
         super();
         this.factor = factor;
         this.exponent = exponent;
@@ -125,9 +126,9 @@ export class ExponentialExpr extends Expr {
 }
 
 export class NumberLiteralExpr extends Expr {
-    value: number;
+    value: Value;
 
-    constructor(value: number) {
+    constructor(value: Value) {
         super();
         this.value = value;
     }

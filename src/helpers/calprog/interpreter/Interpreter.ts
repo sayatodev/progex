@@ -26,9 +26,9 @@ import type {
     FunctionCallExpr,
 } from "./Expr";
 import Token from "./Token";
-import type { ErrorName, Value } from "./types";
+import type { ErrorName } from "./types";
 import { Environment } from "./Environment";
-import * as calprog from "@/helpers/math";
+import { Value } from "./Value";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     private readonly environment: Environment = new Environment();
@@ -55,22 +55,25 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
 
     private display(): void {
         const result = this.environment.result;
-        console.log("DISPLAY->", result);
+        console.log("DISPLAY->", result.toString());
     }
 
     /* Checkers */
     private checkNumberOperand(
         operator: Token,
         operand: Value
-    ): asserts operand is number {
-        if (typeof operand === "number") return;
-        throw new CalcSyntaxError(operator, "Operand must be a number.");
+    ): asserts operand is Value {
+        if (operand instanceof Value) return;
+        throw new MathError(
+            operator,
+            `Operand must be a number, but got ${typeof operand}.`
+        );
     }
 
     private checkPositiveInteger(
         operator: Token,
         operand: Value
-    ): asserts operand is number {
+    ): asserts operand is Value {
         if (
             typeof operand === "number" &&
             operand >= 0 &&
@@ -80,18 +83,23 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         throw new MathError(operator, "Operand must be a positive integer.");
     }
 
-    private checkArgumentsCount(args: Value[], expected: number): void {
-        if (args.length !== expected) {
+    private checkArgumentsCount(
+        args: Value[],
+        expected_min: number,
+        expected_max?: number
+    ): void {
+        if (!expected_max) expected_max = expected_min;
+        if (args.length < expected_min || args.length > expected_max) {
             throw new CalcSyntaxError(
                 null,
-                `Expected ${expected} arguments, but got ${args.length}.`
+                `Expected ${expected_min} to ${expected_max} arguments, but got ${args.length}.`
             );
         }
     }
 
     /* Expr Visitors */
 
-    visitNumberExpr(expr: NumberLiteralExpr): number {
+    visitNumberExpr(expr: NumberLiteralExpr): Value {
         return expr.value;
     }
 
@@ -106,7 +114,7 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         switch (expr.operator.type) {
             case TokenType.MINUS:
             case TokenType.NEGATIVE:
-                return -right;
+                return right.negated();
             case TokenType.PLUS:
                 return right;
             default:
@@ -117,47 +125,55 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         }
     }
 
-    visitFunctionCallExpr(expr: FunctionCallExpr): number {
+    visitFunctionCallExpr(expr: FunctionCallExpr): Value {
         const values = expr.args.map((arg) => this.evaluate(arg));
+        values.forEach((value) => {
+            this.checkNumberOperand(expr.fn, value);
+        });
         const type = expr.fn.type;
 
         switch (type) {
             case TokenType.ABS:
                 this.checkArgumentsCount(values, 1);
-                return Math.abs(values[0]);
+                return values[0].abs();
             case TokenType.POLAR:
                 this.checkArgumentsCount(values, 2);
-                return Math.sqrt(values[0] ** 2 + values[1] ** 2);
+                return values[0].square().add(values[1].square()).sqrt();
             case TokenType.SIN:
                 this.checkArgumentsCount(values, 1);
-                return calprog.sin(this.environment.setup, values[0]);
+                return values[0].sin(this.environment.setup);
+            // return calprog.sin(this.environment.setup, values[0].number());
             case TokenType.COS:
                 this.checkArgumentsCount(values, 1);
-                return calprog.cos(this.environment.setup, values[0]);
+                return values[0].cos(this.environment.setup);
             case TokenType.TAN:
                 this.checkArgumentsCount(values, 1);
-                return calprog.tan(this.environment.setup, values[0]);
+                return values[0].tan(this.environment.setup);
             case TokenType.ARC_SIN:
                 this.checkArgumentsCount(values, 1);
-                return calprog.arcsin(this.environment.setup, values[0]);
+                return values[0].asin(this.environment.setup);
             case TokenType.ARC_COS:
                 this.checkArgumentsCount(values, 1);
-                return calprog.arccos(this.environment.setup, values[0]);
+                return values[0].acos(this.environment.setup);
             case TokenType.ARC_TAN:
                 this.checkArgumentsCount(values, 1);
-                return calprog.arctan(this.environment.setup, values[0]);
+                return values[0].atan(this.environment.setup);
             case TokenType.LOG:
-                this.checkArgumentsCount(values, 2);
-                return calprog.log(values[0], values[1]);
+                this.checkArgumentsCount(values, 1, 2);
+                if (values.length === 1) {
+                    return values[0].log();
+                } else {
+                    return values[1].log_x(values[0]);
+                }
             case TokenType.LN:
                 this.checkArgumentsCount(values, 1);
-                return calprog.ln(values[0]);
+                return values[0].ln();
             case TokenType.SQRT:
                 this.checkArgumentsCount(values, 1);
-                return Math.sqrt(values[0]);
+                return values[0].sqrt();
             case TokenType.CUBE_ROOT:
                 this.checkArgumentsCount(values, 1);
-                return Math.cbrt(values[0]);
+                return values[0].cbrt();
             default:
                 throw new CalcSyntaxError(
                     expr.fn,
@@ -166,22 +182,22 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         }
     }
 
-    visitUnaryExpr(expr: UnaryExpr): number {
+    visitUnaryExpr(expr: UnaryExpr): Value {
         const value = this.evaluate(expr.expression);
         this.checkNumberOperand(expr.operator, value);
 
         switch (expr.operator.type) {
             case TokenType.INVERSE:
-                return 1 / value;
+                return value.inverse();
             case TokenType.SQUARE:
-                return Math.pow(value, 2);
+                return value.square();
             case TokenType.CUBE:
-                return Math.pow(value, 3);
+                return value.cube();
             case TokenType.FACTORIAL:
                 this.checkPositiveInteger(expr.operator, value);
-                return calprog.factorial(value);
+                return value.factorial();
             case TokenType.PERCENT:
-                return value / 100;
+                return value.percent();
             default:
                 throw new CalcSyntaxError(
                     expr.operator,
@@ -195,10 +211,10 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         const right = this.evaluate(expr.right);
 
         if (expr.operator === null) {
-            if (typeof left !== "number" || typeof right !== "number") {
+            if (!(left instanceof Value && right instanceof Value)) {
                 throw new CalcSyntaxError(null, "Operands must be numbers.");
             }
-            return left * right;
+            return left.mul(right);
         }
 
         this.checkNumberOperand(expr.operator, left);
@@ -207,51 +223,51 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         switch (expr.operator.type) {
             /* Term arithmetic operators */
             case TokenType.PLUS:
-                return left + right;
+                return left.add(right);
             case TokenType.MINUS:
-                return left - right;
+                return left.sub(right);
             /* Other arithmetic operators */
             case TokenType.MULTIPLY:
-                return left * right;
+                return left.mul(right);
             case TokenType.DIVIDE:
-                if (right === 0) {
+                if (right.value.eq(0)) {
                     throw new MathError(expr.operator, "Division by zero");
                 }
-                return left / right;
+                return left.div(right);
             case TokenType.FRACTION:
-                if (right === 0) {
+                if (right.value.eq(0)) {
                     throw new MathError(expr.operator, "Division by zero");
                 }
                 // todo: fraction type
-                return left / right;
+                return left.div(right);
             /* Comparison operators */
             case TokenType.GT:
-                return left > right ? 1 : 0;
+                return Value.from(left.greaterThan(right) ? 1 : 0);
             case TokenType.GTE:
-                return left >= right ? 1 : 0;
+                return Value.from(left.greaterThanOrEqual(right) ? 1 : 0);
             case TokenType.LT:
-                return left < right ? 1 : 0;
+                return Value.from(left.lessThan(right) ? 1 : 0);
             case TokenType.LTE:
-                return left <= right ? 1 : 0;
+                return Value.from(left.lessThanOrEqual(right) ? 1 : 0);
             /* Equality operators */
             case TokenType.EQ:
-                return left === right ? 1 : 0;
+                return Value.from(left.equal(right) ? 1 : 0);
             case TokenType.NEQ:
-                return left !== right ? 1 : 0;
+                return Value.from(left.notEqual(right) ? 1 : 0);
             /* Combinatorial operators */
             case TokenType.PERMUTATION:
                 this.checkPositiveInteger(expr.operator, left);
                 this.checkPositiveInteger(expr.operator, right);
-                return calprog.permutation(left, right);
+                return left.permutation(right);
             case TokenType.COMBINATION:
                 this.checkPositiveInteger(expr.operator, left);
                 this.checkPositiveInteger(expr.operator, right);
-                return calprog.combination(left, right);
+                return left.combination(right);
             /* Custom Indices */
             case TokenType.X_POWER:
-                return left ** right;
+                return left.pow(right);
             case TokenType.X_ROOT:
-                return left ** (1 / right);
+                return left.x_root(right);
             /* Unreachable */
             default:
                 throw new CalcSyntaxError(
@@ -261,8 +277,8 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         }
     }
 
-    visitExponentialExpr(expr: ExponentialExpr): number {
-        return expr.factor * 10 ** expr.exponent;
+    visitExponentialExpr(expr: ExponentialExpr): Value {
+        return expr.factor.exp(expr.exponent);
     }
 
     visitVariableExpr(expr: VariableExpr): Value {

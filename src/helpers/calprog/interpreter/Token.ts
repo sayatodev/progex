@@ -1,6 +1,7 @@
 import { type TokenType } from "./enums";
+import { Value } from "./Value";
 
-export type Literal = number | string | null | undefined;
+export type Literal = Value | string | null;
 export default class Token<
     T extends TokenType = TokenType,
     LexemeT = string,

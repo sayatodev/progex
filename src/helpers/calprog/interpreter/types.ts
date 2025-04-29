@@ -58,7 +58,7 @@ export type FunctionIdentifier =
     | TokenType.LOG
     | TokenType.LN
     | TokenType.SQRT
-    | TokenType.CUBE_ROOT
+    | TokenType.CUBE_ROOT;
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;
@@ -74,13 +74,18 @@ export type VariableName =
 export type ConstantName = SymbolValue.PI | SymbolValue.E;
 export type IdentifierName = VariableName | ConstantName | SymbolValue.ANSWER;
 
-export type Value = number;
-
 export type IdentifierToken = Token<Identifier, IdentifierName>;
 
-// Utility types
+/* Utility types */
 export type ErrorName =
     | "SyntaxError"
     | "RuntimeError"
     | "StackError"
     | "MathError";
+
+/* Helper types */
+type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N
+    ? A
+    : GrowToSize<T, N, [...A, T]>;
+
+export type FixedArray<T, N extends number> = GrowToSize<T, N, []>;

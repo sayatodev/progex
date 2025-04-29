@@ -3,6 +3,7 @@ import { MAX_SYMBOL_LENGTH } from "../../../data/programSymbols/index";
 import { TokenType } from "./enums";
 import Token, { Literal } from "./Token";
 import type { VariableName, ConstantName } from "./types";
+import { Value } from "./Value";
 export default class Scanner {
     private readonly program: string;
     private readonly tokens: Token[] = [];
@@ -228,7 +229,7 @@ export default class Scanner {
         }
 
         const value = this.program.substring(this.start, this.current);
-        this.addToken(TokenType.NUMBER, parseFloat(value));
+        this.addToken(TokenType.NUMBER, Value.from(value));
         // TODO: Create custom float class to simulate calculator float
     }
 }
