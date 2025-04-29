@@ -23,7 +23,7 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 
 #### Interpreter - Feature Checklist
 - [x] Basic Arithmetic Operations (Addition, Subtraction, Multiplication, Division)
-- [ ] EXP
+- [x] EXP
 - [x] Negation
 - [ ] Memory controls (M+, M-)
 - [ ] Random

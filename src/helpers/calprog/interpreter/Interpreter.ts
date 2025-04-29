@@ -20,6 +20,7 @@ import type {
     UnaryExpr,
     VariableExpr,
     ExprVisitor,
+    ExponentialExpr,
 } from "./Expr";
 import type Token from "./Token";
 import type { ErrorName, Value } from "./types";
@@ -140,6 +141,10 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                     "Invalid operator: " + expr.operator.lexeme
                 );
         }
+    }
+
+    visitExponentialExpr(expr: ExponentialExpr): number {
+        return expr.factor * 10 ** expr.exponent;
     }
 
     visitVariableExpr(expr: VariableExpr): Value {

@@ -14,6 +14,7 @@ export abstract class Expr {
 export interface ExprVisitor<R> {
     visitBinaryExpr(expr: BinaryExpr): R;
     visitGroupingExpr(expr: GroupingExpr): R;
+    visitExponentialExpr(expr: ExponentialExpr): R;
     visitNumberExpr(expr: NumberLiteralExpr): R;
     visitUnaryExpr(expr: UnaryExpr): R;
     visitVariableExpr(expr: VariableExpr): R;
@@ -24,7 +25,11 @@ export class BinaryExpr extends Expr {
     operator: Token<BinaryOperator> | null; // Null would mean multiplication
     right: Expr;
 
-    constructor(left: Expr, operator: Token<BinaryOperator> | null, right: Expr) {
+    constructor(
+        left: Expr,
+        operator: Token<BinaryOperator> | null,
+        right: Expr
+    ) {
         super();
         this.left = left;
         this.operator = operator;
@@ -56,6 +61,24 @@ export class GroupingExpr extends Expr {
 
     toString(): string {
         return `(Grouping (${this.expression.toString()}))`;
+    }
+}
+
+export class ExponentialExpr extends Expr {
+    factor: number;
+    exponent: number;
+    constructor(factor: number, exponent: number) {
+        super();
+        this.factor = factor;
+        this.exponent = exponent;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitExponentialExpr(this);
+    }
+
+    toString(): string {
+        return `(Exponential ${this.factor})`;
     }
 }
 

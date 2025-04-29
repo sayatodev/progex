@@ -6,6 +6,7 @@ import {
     NumberLiteralExpr,
     UnaryExpr,
     VariableExpr,
+    ExponentialExpr,
 } from "./Expr";
 import { AssignmentStmt, DisplayStmt, ExpressionStmt, Stmt } from "./Stmt";
 import Token from "./Token";
@@ -142,7 +143,15 @@ export default class Parser {
 
     private primary(): Expr {
         if (this.match(TokenType.NUMBER)) {
-            return new NumberLiteralExpr(this.previous().literal as number);
+            const literal = this.previous().literal as number;
+            if (this.match(TokenType.EXP)) {
+                const exponent = this.consume(
+                    TokenType.NUMBER,
+                    "Expect exponent after EXP"
+                );
+                return new ExponentialExpr(literal, exponent.literal as number)
+            }
+            return new NumberLiteralExpr(literal as number);
         }
 
         if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
@@ -194,7 +203,7 @@ export default class Parser {
                     this.peek() as Token<TokenType.EOP>
                 );
             }
-            
+
             const terminator = this.consume(
                 [TokenType.COLON, TokenType.DISPLAY],
                 "Expect statement terminator."
