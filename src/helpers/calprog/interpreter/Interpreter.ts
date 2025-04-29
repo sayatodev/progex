@@ -27,6 +27,7 @@ import type {
 import type Token from "./Token";
 import type { ErrorName, Value } from "./types";
 import { Environment } from "./Environment";
+import { factorial } from "@/helpers/math";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     private readonly environment: Environment = new Environment();
@@ -63,6 +64,18 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     ): asserts operand is number {
         if (typeof operand === "number") return;
         throw new CalcSyntaxError(operator, "Operand must be a number.");
+    }
+
+    private checkPositiveInteger(
+        operator: Token,
+        operand: Value
+    ): asserts operand is number {
+        if (typeof operand === "number" && operand >= 0 && Number.isInteger(operand))
+            return;
+        throw new CalcSyntaxError(
+            operator,
+            "Operand must be a positive integer."
+        );
     }
 
     /* Expr Visitors */
@@ -104,6 +117,9 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 return Math.pow(value, 2);
             case TokenType.CUBE:
                 return Math.pow(value, 3);
+            case TokenType.FACTORIAL:
+                this.checkPositiveInteger(expr.operator, value);
+                return factorial(value);
             default:
                 throw new CalcSyntaxError(
                     expr.operator,

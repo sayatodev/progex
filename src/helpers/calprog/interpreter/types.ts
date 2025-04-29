@@ -34,7 +34,7 @@ export type BinaryOperator =
     | ComparisonOperator
     | EqualityOperator;
 
-export type UnaryOperator = ExponentOperator;
+export type UnaryOperator = ExponentOperator | TokenType.FACTORIAL;
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;

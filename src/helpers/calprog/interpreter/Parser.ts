@@ -173,7 +173,10 @@ export default class Parser {
         let expr = this.primary();
 
         while (
-            this.match(TokenType.INVERSE, TokenType.SQUARE, TokenType.CUBE)
+            this.match(
+                ...[TokenType.INVERSE, TokenType.SQUARE, TokenType.CUBE],
+                ...[TokenType.FACTORIAL]
+            )
         ) {
             const operator = this.previous() as Token<ExponentOperator>;
             expr = new UnaryExpr(expr, operator);
