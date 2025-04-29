@@ -12,10 +12,19 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { program_name } = await params;
-    const data: ProgramData = await import(
-        "@/data/presetPrograms/" + program_name + ".json"
-    );
-    if (!data) {
+    try {
+        const data: ProgramData = await import(
+            "@/data/presetPrograms/" + program_name + ".json"
+        );
+        return {
+            openGraph: {
+                title: "Progex - " + data.title,
+                description: "Calculator program for" + data.title,
+                url: "https://progex.com/view/preset/" + program_name,
+                siteName: "Progex",
+            },
+        };
+    } catch {
         return {
             openGraph: {
                 title: "Progex - Not found",
@@ -25,14 +34,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
             },
         };
     }
-    return {
-        openGraph: {
-            title: "Progex - " + data.title,
-            description: "Calculator program for" + data.title,
-            url: "https://progex.com/view/preset/" + program_name,
-            siteName: "Progex",
-        },
-    };
 }
 
 export default async function Home({ params }: Props) {
