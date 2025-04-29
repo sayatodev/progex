@@ -18,3 +18,40 @@ The preview is taken with the built version for commit [f48554b](https://github.
 
 ### The interpreter (WIP)
 The interpreter is highly influenced by [Crafting Interpreters](https://craftinginterpreters.com/) ([Github](https://github.com/munificent/craftinginterpreters)), which has the code licensed under MIT. [See original license](https://github.com/munificent/craftinginterpreters?tab=License-1-ov-file)
+
+---
+
+#### Interpreter - Feature Checklist
+- [x] Basic Arithmetic Operations (Addition, Subtraction, Multiplication, Division)
+- [ ] EXP
+- [x] Negation
+- [ ] Memory controls (M+, M-)
+- [ ] Random
+- [ ] Input
+- [ ] Inverse/Square/Cube/to the power of X
+- [ ] Factorial
+- [ ] Percent
+- [ ] Permutation, Combination
+- [x] Assignment
+- [ ] Absolute
+- [ ] Polar
+- [ ] Square root, log, ln
+- [ ] Sin/cos/tan
+- [ ] Arc sin/cos/tan
+- [ ] Comparisons (GTE/LTE/GT/LT/EQ/NEQ)
+- [ ] Arrow (Prog mode)
+- [ ] If/Then/Else/If end
+- [ ] For/To/Step/Next/Break
+- [ ] While/While end
+- [ ] Goto/Label
+- [x] Colon
+- [x] Display
+- [x] Parentheses
+- [ ] Rec/Rnd
+- [ ] Semicolon
+- [ ] Comma
+- [ ] Degree
+- [ ] To polar, To complex
+- [ ] Argument, Conjugate
+- [ ] Complex argument
+- [ ] Execution
