@@ -15,7 +15,6 @@ export default class Scanner {
         [SymbolValue.M_MINUS, TokenType.M_MINUS],
         [SymbolValue.TO_POLAR, TokenType.TO_POLAR],
         [SymbolValue.TO_COMPLEX, TokenType.TO_COMPLEX],
-        [SymbolValue.RANDOM, TokenType.RANDOM],
         [SymbolValue.SEMICOLON, TokenType.SEMICOLON],
         [SymbolValue.INPUT, TokenType.INPUT],
         [SymbolValue.COLON, TokenType.COLON],
@@ -137,6 +136,7 @@ export default class Scanner {
             case SymbolValue.Y:
             case SymbolValue.M:
             case SymbolValue.ANSWER:
+            case SymbolValue.RANDOM:
                 return true;
             default:
                 return false;
@@ -195,10 +195,10 @@ export default class Scanner {
             }
 
             // Variables and Constants (Might have multiple characters)
-            if (this.isVariable(c)) {
-                this.addToken(TokenType.VARIABLE, c);
-            } else if (this.isConstant(c)) {
-                this.addToken(TokenType.CONSTANT, c);
+            if (this.isVariable(matched_symbol)) {
+                this.addToken(TokenType.VARIABLE, matched_symbol);
+            } else if (this.isConstant(matched_symbol)) {
+                this.addToken(TokenType.CONSTANT, matched_symbol);
             }
         }
     }

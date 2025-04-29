@@ -25,7 +25,7 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Basic Arithmetic Operations (Addition, Subtraction, Multiplication, Division)
 - [x] EXP
 - [x] Negation
-- [ ] Memory controls (M+, M-)
+- [x] Memory controls (M+, M-)
 - [ ] Random
 - [ ] Input
 - [ ] Inverse/Square/Cube/to the power of X

@@ -1,15 +1,6 @@
 import { SymbolValue } from "@/data/programSymbols/generatedEnums";
 import initiateRecord from "@/helpers/initiateRecord";
-import type { IdentifierName, Value } from "./types";
-
-type VariableName =
-    | SymbolValue.A
-    | SymbolValue.B
-    | SymbolValue.C
-    | SymbolValue.D
-    | SymbolValue.X
-    | SymbolValue.Y
-    | SymbolValue.M;
+import type { IdentifierName, Value, VariableName } from "./types";
 
 const variableNames: VariableName[] = [
     SymbolValue.A,
@@ -46,6 +37,10 @@ export class Environment {
         if (name === SymbolValue.ANSWER) {
             console.debug("ANSWER->", this.result);
             return this.result;
+        }
+        if (name === SymbolValue.RANDOM) {
+            const randomValue = Math.round(Math.random() * 1000) / 1000;
+            return randomValue;
         }
         if (name in this.constants) {
             return this.constants[name as ConstantName];

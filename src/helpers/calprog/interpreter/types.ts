@@ -38,7 +38,8 @@ export type VariableName =
     | SymbolValue.D
     | SymbolValue.X
     | SymbolValue.Y
-    | SymbolValue.M;
+    | SymbolValue.M
+    | SymbolValue.RANDOM;
 export type ConstantName = SymbolValue.PI | SymbolValue.E;
 export type IdentifierName = VariableName | ConstantName | SymbolValue.ANSWER;
 
