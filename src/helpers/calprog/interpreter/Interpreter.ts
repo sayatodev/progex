@@ -25,17 +25,10 @@ import type {
     UnaryExpr,
     FunctionCallExpr,
 } from "./Expr";
-import type Token from "./Token";
+import Token from "./Token";
 import type { ErrorName, Value } from "./types";
 import { Environment } from "./Environment";
-import {
-    combination,
-    cos,
-    factorial,
-    permutation,
-    sin,
-    tan,
-} from "@/helpers/math";
+import * as calprog from "@/helpers/math";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     private readonly environment: Environment = new Environment();
@@ -137,13 +130,34 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 return Math.sqrt(values[0] ** 2 + values[1] ** 2);
             case TokenType.SIN:
                 this.checkArgumentsCount(values, 1);
-                return sin(this.environment.setup, values[0]);
+                return calprog.sin(this.environment.setup, values[0]);
             case TokenType.COS:
                 this.checkArgumentsCount(values, 1);
-                return cos(this.environment.setup, values[0]);
+                return calprog.cos(this.environment.setup, values[0]);
             case TokenType.TAN:
                 this.checkArgumentsCount(values, 1);
-                return tan(this.environment.setup, values[0]);
+                return calprog.tan(this.environment.setup, values[0]);
+            case TokenType.ARC_SIN:
+                this.checkArgumentsCount(values, 1);
+                return calprog.arcsin(this.environment.setup, values[0]);
+            case TokenType.ARC_COS:
+                this.checkArgumentsCount(values, 1);
+                return calprog.arccos(this.environment.setup, values[0]);
+            case TokenType.ARC_TAN:
+                this.checkArgumentsCount(values, 1);
+                return calprog.arctan(this.environment.setup, values[0]);
+            case TokenType.LOG:
+                this.checkArgumentsCount(values, 2);
+                return calprog.log(values[0], values[1]);
+            case TokenType.LN:
+                this.checkArgumentsCount(values, 1);
+                return calprog.ln(values[0]);
+            case TokenType.SQRT:
+                this.checkArgumentsCount(values, 1);
+                return Math.sqrt(values[0]);
+            case TokenType.CUBE_ROOT:
+                this.checkArgumentsCount(values, 1);
+                return Math.cbrt(values[0]);
             default:
                 throw new CalcSyntaxError(
                     expr.fn,
@@ -165,7 +179,7 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 return Math.pow(value, 3);
             case TokenType.FACTORIAL:
                 this.checkPositiveInteger(expr.operator, value);
-                return factorial(value);
+                return calprog.factorial(value);
             case TokenType.PERCENT:
                 return value / 100;
             default:
@@ -228,11 +242,16 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
             case TokenType.PERMUTATION:
                 this.checkPositiveInteger(expr.operator, left);
                 this.checkPositiveInteger(expr.operator, right);
-                return permutation(left, right);
+                return calprog.permutation(left, right);
             case TokenType.COMBINATION:
                 this.checkPositiveInteger(expr.operator, left);
                 this.checkPositiveInteger(expr.operator, right);
-                return combination(left, right);
+                return calprog.combination(left, right);
+            /* Custom Indices */
+            case TokenType.X_POWER:
+                return left ** right;
+            case TokenType.X_ROOT:
+                return left ** (1 / right);
             /* Unreachable */
             default:
                 throw new CalcSyntaxError(

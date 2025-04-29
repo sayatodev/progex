@@ -37,7 +37,9 @@ export type BinaryOperator =
     | FactorOperator
     | ComparisonOperator
     | EqualityOperator
-    | CombinatorialOperator;
+    | CombinatorialOperator
+    | TokenType.X_POWER
+    | TokenType.X_ROOT;
 
 export type UnaryOperator =
     | ExponentOperator
@@ -49,7 +51,14 @@ export type FunctionIdentifier =
     | TokenType.POLAR
     | TokenType.SIN
     | TokenType.COS
-    | TokenType.TAN;
+    | TokenType.TAN
+    | TokenType.ARC_SIN
+    | TokenType.ARC_COS
+    | TokenType.ARC_TAN
+    | TokenType.LOG
+    | TokenType.LN
+    | TokenType.SQRT
+    | TokenType.CUBE_ROOT
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;

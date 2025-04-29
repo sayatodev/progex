@@ -32,6 +32,8 @@ import {
 const FUNCTIONS = [
     ...[TokenType.ABS, TokenType.POLAR],
     ...[TokenType.SIN, TokenType.COS, TokenType.TAN],
+    ...[TokenType.ARC_SIN, TokenType.ARC_COS, TokenType.ARC_TAN],
+    ...[TokenType.LOG, TokenType.LN, TokenType.SQRT, TokenType.CUBE_ROOT],
 ];
 
 export default class Parser {
@@ -141,7 +143,8 @@ export default class Parser {
                 ...[TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION],
                 /* Chainable symbols (Treated as multiplication) */
                 ...[TokenType.VARIABLE, TokenType.CONSTANT],
-                ...FUNCTIONS
+                ...FUNCTIONS,
+                ...[TokenType.X_POWER, TokenType.X_ROOT]
             )
         ) {
             const type = this.peek().type;
@@ -162,7 +165,7 @@ export default class Parser {
                 /* Chaining identifiers */
                 case TokenType.VARIABLE:
                 case TokenType.CONSTANT:
-                    expr = new BinaryExpr(expr, null, this.signed() as Expr);
+                    expr = new BinaryExpr(expr, null, this.signed());
                     break;
                 /* Chaining function calls */
                 case TokenType.ABS:
@@ -170,7 +173,24 @@ export default class Parser {
                 case TokenType.SIN:
                 case TokenType.COS:
                 case TokenType.TAN:
-                    expr = new BinaryExpr(expr, null, this.signed() as Expr);
+                case TokenType.ARC_SIN:
+                case TokenType.ARC_COS:
+                case TokenType.ARC_TAN:
+                case TokenType.LOG:
+                case TokenType.LN:
+                case TokenType.SQRT:
+                case TokenType.CUBE_ROOT:
+                    expr = new BinaryExpr(expr, null, this.signed());
+                    break;
+                /* Custom Indices */
+                case TokenType.X_POWER:
+                case TokenType.X_ROOT:
+                    const x_operator = this.consume(
+                        [TokenType.X_POWER, TokenType.X_ROOT],
+                        "Expect ^ operator"
+                    );
+                    expr = new BinaryExpr(expr, x_operator, this.signed());
+                    this.consume(TokenType.RIGHT_PARENTHESIS, "Expect )");
                     break;
                 /* Supposedly unreachable */
                 default:

@@ -29,7 +29,7 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Random
 - [ ] Input
 - [x] Inverse/Square/Cube
-- [ ] to the power of X
+- [x] to the power of X
 - [x] Factorial
 - [x] Percent
 - [x] Permutation, Combination
@@ -37,9 +37,9 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Absolute
 - [x] Polar
 - [x] Square root, log, ln
-- [ ] Sin/cos/tan
-- [ ] Arc sin/cos/tan
-- [ ] Comparisons (GTE/LTE/GT/LT/EQ/NEQ)
+- [x] Sin/cos/tan
+- [x] Arc sin/cos/tan
+- [x] Comparisons (GTE/LTE/GT/LT/EQ/NEQ)
 - [ ] Arrow (Prog mode)
 - [ ] If/Then/Else/If end
 - [ ] For/To/Step/Next/Break
@@ -50,7 +50,7 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Parentheses
 - [ ] Rec/Rnd
 - [ ] Semicolon
-- [ ] Comma
+- [x] Comma
 - [ ] Degree
 - [ ] To polar, To complex
 - [ ] Argument, Conjugate
