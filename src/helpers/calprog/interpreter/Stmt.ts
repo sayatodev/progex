@@ -11,6 +11,7 @@ export interface StmtVisitor<R> {
     visitExpressionStmt(stmt: ExpressionStmt): R;
     visitDisplayStmt(stmt: DisplayStmt): R;
     visitAssignmentStmt(stmt: AssignmentStmt): R;
+    visitMemoryControlStmt(stmt: MemoryControlStmt): R;
     visitIfStmt(stmt: IfStmt): R;
     visitWhileStmt(stmt: WhileStmt): R;
     visitGotoStmt(stmt: GotoStmt): R;
@@ -62,6 +63,24 @@ export class AssignmentStmt extends Stmt {
 
     accept<R>(visitor: StmtVisitor<R>): R {
         return visitor.visitAssignmentStmt(this);
+    }
+}
+
+export class MemoryControlStmt extends Stmt {
+    expression: Expr;
+    operator: Token<TokenType.M_PLUS | TokenType.M_MINUS>;
+
+    constructor(
+        expression: Expr,
+        operator: Token<TokenType.M_PLUS | TokenType.M_MINUS>
+    ) {
+        super();
+        this.expression = expression;
+        this.operator = operator;
+    }
+
+    accept<R>(visitor: StmtVisitor<R>): R {
+        return visitor.visitMemoryControlStmt(this);
     }
 }
 

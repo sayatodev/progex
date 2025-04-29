@@ -10,6 +10,7 @@ import type {
     StmtVisitor,
     AssignmentStmt,
     WhileStmt,
+    MemoryControlStmt,
 } from "./Stmt";
 import { CalcSyntaxError, MathError, RuntimeError } from "./Errors";
 import type {
@@ -176,6 +177,16 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         if (stmt.terminator.type === TokenType.DISPLAY) {
             this.display();
         }
+    }
+
+    visitMemoryControlStmt(stmt: MemoryControlStmt): void {
+        const result = this.evaluate(stmt.expression);
+        if (stmt.operator.type === TokenType.M_PLUS) {
+            this.environment.mIncrement(result);
+        } else if (stmt.operator.type === TokenType.M_MINUS) {
+            this.environment.mIncrement(result);
+        }
+        this.environment.result = result;
     }
 
     visitIfStmt(stmt: IfStmt): void {

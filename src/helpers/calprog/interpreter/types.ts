@@ -1,5 +1,6 @@
-import { SymbolValue } from "@/data/programSymbols/generatedEnums";
-import { TokenType } from "./enums";
+import type { SymbolValue } from "@/data/programSymbols/generatedEnums";
+import type { TokenType } from "./enums";
+import type Token from "./Token";
 
 // Token types that are used in expressions
 export type TermOperator = TokenType.PLUS | TokenType.MINUS;
@@ -42,6 +43,8 @@ export type ConstantName = SymbolValue.PI | SymbolValue.E;
 export type IdentifierName = VariableName | ConstantName | SymbolValue.ANSWER;
 
 export type Value = number;
+
+export type IdentifierToken = Token<Identifier, IdentifierName>;
 
 // Utility types
 export type ErrorName =

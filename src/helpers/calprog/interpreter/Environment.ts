@@ -56,11 +56,11 @@ export class Environment {
         throw new Error(`Undefined variable: ${name}`);
     }
 
-    mIncrement(): void {
-        this.variables[SymbolValue.M]++;
+    mIncrement(value: Value): void {
+        this.variables[SymbolValue.M] += value;
     }
 
-    mDecrement(): void {
-        this.variables[SymbolValue.M]--;
+    mDecrement(value: Value): void {
+        this.variables[SymbolValue.M] -= value;
     }
 }

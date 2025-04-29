@@ -8,12 +8,19 @@ import {
     VariableExpr,
     ExponentialExpr,
 } from "./Expr";
-import { AssignmentStmt, DisplayStmt, ExpressionStmt, Stmt } from "./Stmt";
+import {
+    AssignmentStmt,
+    DisplayStmt,
+    ExpressionStmt,
+    MemoryControlStmt,
+    Stmt,
+} from "./Stmt";
 import Token from "./Token";
 import {
     EqualityOperator,
     Identifier,
     IdentifierName,
+    IdentifierToken,
     UnaryOperator,
     VariableName,
 } from "./types";
@@ -149,21 +156,29 @@ export default class Parser {
                     TokenType.NUMBER,
                     "Expect exponent after EXP"
                 );
-                return new ExponentialExpr(literal, exponent.literal as number)
+                return new ExponentialExpr(literal, exponent.literal as number);
             }
-            return new NumberLiteralExpr(literal as number);
+            let expr: Expr = new NumberLiteralExpr(literal as number);
+
+            // Handle chained variables or constants (e.g. 4AB, 3AB)
+            while (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
+                const rightIdentifier = this.previous() as IdentifierToken;
+                const right = new VariableExpr(
+                    rightIdentifier,
+                    rightIdentifier.lexeme
+                );
+                expr = new BinaryExpr(expr, null, right);
+            }
+            return expr;
         }
 
         if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
-            const identifier = this.previous() as Token<Identifier>;
-            let expr: Expr = new VariableExpr(
-                identifier,
-                identifier.lexeme as IdentifierName
-            );
+            const identifier = this.previous() as IdentifierToken;
+            let expr: Expr = new VariableExpr(identifier, identifier.lexeme);
 
             // Handle chained variables or constants (e.g., AB = A*B)
             while (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
-                const rightIdentifier = this.previous() as Token<Identifier>;
+                const rightIdentifier = this.previous() as IdentifierToken;
                 const right = new VariableExpr(
                     rightIdentifier,
                     rightIdentifier.lexeme as IdentifierName
@@ -211,6 +226,21 @@ export default class Parser {
             return new AssignmentStmt(variable, expression, terminator);
         }
 
+        type MemoryControlToken = Token<TokenType.M_PLUS | TokenType.M_MINUS>;
+        if (this.match(TokenType.M_PLUS, TokenType.M_MINUS)) {
+            const operator = this.previous() as MemoryControlToken;
+            const stmt = new MemoryControlStmt(expression, operator);
+
+            if (this.isAtEnd()) return stmt;
+            const terminator = this.consume(
+                [TokenType.COLON, TokenType.DISPLAY],
+                "Expect statement terminator."
+            );
+            if (terminator.type === TokenType.DISPLAY) {
+                return new DisplayStmt(stmt);
+            }
+            return stmt;
+        }
         if (this.match(TokenType.DISPLAY)) {
             return new DisplayStmt(new ExpressionStmt(expression));
         }
