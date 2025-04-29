@@ -5,3 +5,13 @@ export function factorial(n: number): number {
     }
     return result;
 }
+
+export function permutation(n: number, r: number): number {
+    if (r > n) return 0;
+    return factorial(n) / factorial(n - r);
+}
+
+export function combination(n: number, r: number): number {
+    if (r > n) return 0;
+    return factorial(n) / (factorial(r) * factorial(n - r));
+}

@@ -28,10 +28,11 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Memory controls (M+, M-)
 - [x] Random
 - [ ] Input
-- [x] Inverse/Square/Cube/to the power of X
-- [ ] Factorial
-- [ ] Percent
-- [ ] Permutation, Combination
+- [x] Inverse/Square/Cube
+- [ ] to the power of X
+- [x] Factorial
+- [x] Percent
+- [x] Permutation, Combination
 - [x] Assignment
 - [ ] Absolute
 - [ ] Polar

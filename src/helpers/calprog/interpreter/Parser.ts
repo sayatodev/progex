@@ -18,6 +18,7 @@ import {
 } from "./Stmt";
 import Token from "./Token";
 import {
+    CombinatorialOperator,
     EqualityOperator,
     ExponentOperator,
     Identifier,
@@ -166,7 +167,17 @@ export default class Parser {
             return new SignedExpr(operator, right);
         }
 
-        return this.unary();
+        return this.combinatorial();
+    }
+
+    private combinatorial(): Expr {
+        let expr = this.unary();
+        while (this.match(TokenType.COMBINATION, TokenType.PERMUTATION)) {
+            const operator = this.previous() as Token<CombinatorialOperator>;
+            const right = this.unary();
+            expr = new BinaryExpr(expr, operator, right);
+        }
+        return expr;
     }
 
     private unary(): Expr {
@@ -175,7 +186,7 @@ export default class Parser {
         while (
             this.match(
                 ...[TokenType.INVERSE, TokenType.SQUARE, TokenType.CUBE],
-                ...[TokenType.FACTORIAL]
+                ...[TokenType.FACTORIAL, TokenType.PERCENT]
             )
         ) {
             const operator = this.previous() as Token<ExponentOperator>;

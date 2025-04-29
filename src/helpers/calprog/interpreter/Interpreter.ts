@@ -27,7 +27,7 @@ import type {
 import type Token from "./Token";
 import type { ErrorName, Value } from "./types";
 import { Environment } from "./Environment";
-import { factorial } from "@/helpers/math";
+import { combination, factorial, permutation } from "@/helpers/math";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     private readonly environment: Environment = new Environment();
@@ -70,9 +70,13 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         operator: Token,
         operand: Value
     ): asserts operand is number {
-        if (typeof operand === "number" && operand >= 0 && Number.isInteger(operand))
+        if (
+            typeof operand === "number" &&
+            operand >= 0 &&
+            Number.isInteger(operand)
+        )
             return;
-        throw new CalcSyntaxError(
+        throw new MathError(
             operator,
             "Operand must be a positive integer."
         );
@@ -120,6 +124,8 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
             case TokenType.FACTORIAL:
                 this.checkPositiveInteger(expr.operator, value);
                 return factorial(value);
+            case TokenType.PERCENT:
+                return value / 100;
             default:
                 throw new CalcSyntaxError(
                     expr.operator,
@@ -176,6 +182,15 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 return left === right ? 1 : 0;
             case TokenType.NEQ:
                 return left !== right ? 1 : 0;
+            /* Combinatorial operators */
+            case TokenType.PERMUTATION:
+                this.checkPositiveInteger(expr.operator, left);
+                this.checkPositiveInteger(expr.operator, right);
+                return permutation(left, right);
+            case TokenType.COMBINATION:
+                this.checkPositiveInteger(expr.operator, left);
+                this.checkPositiveInteger(expr.operator, right);
+                return combination(left, right);
             /* Unreachable */
             default:
                 throw new CalcSyntaxError(

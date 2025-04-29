@@ -28,13 +28,21 @@ export type ExponentOperator =
     | TokenType.SQUARE
     | TokenType.CUBE;
 
+export type CombinatorialOperator =
+    | TokenType.PERMUTATION
+    | TokenType.COMBINATION;
+
 export type BinaryOperator =
     | TermOperator
     | FactorOperator
     | ComparisonOperator
-    | EqualityOperator;
+    | EqualityOperator
+    | CombinatorialOperator;
 
-export type UnaryOperator = ExponentOperator | TokenType.FACTORIAL;
+export type UnaryOperator =
+    | ExponentOperator
+    | TokenType.FACTORIAL
+    | TokenType.PERCENT;
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;
