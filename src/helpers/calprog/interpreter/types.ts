@@ -18,16 +18,23 @@ export type ComparisonOperator =
 
 export type EqualityOperator = TokenType.EQ | TokenType.NEQ;
 
+export type SignedOperator =
+    | TokenType.MINUS
+    | TokenType.NEGATIVE
+    | TokenType.PLUS;
+
+export type ExponentOperator =
+    | TokenType.INVERSE
+    | TokenType.SQUARE
+    | TokenType.CUBE;
+
 export type BinaryOperator =
     | TermOperator
     | FactorOperator
     | ComparisonOperator
     | EqualityOperator;
 
-export type UnaryOperator =
-    | TokenType.MINUS
-    | TokenType.NEGATIVE
-    | TokenType.PLUS;
+export type UnaryOperator = ExponentOperator;
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;

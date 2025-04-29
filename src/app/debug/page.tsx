@@ -18,10 +18,11 @@ function debug(program: string, inputs: string[] = []) {
         console.debug("Tokens", tokens);
 
         const parser = new Parser(tokens);
-        const expression = parser.parse();
+        const statements = parser.parse();
+        console.debug("Expression", statements);
 
         const interpreter = new Interpreter();
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
 
         console.log("Debugging complete.");
     } catch (error) {

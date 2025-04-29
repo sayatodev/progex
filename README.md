@@ -26,7 +26,7 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] EXP
 - [x] Negation
 - [x] Memory controls (M+, M-)
-- [ ] Random
+- [x] Random
 - [ ] Input
 - [ ] Inverse/Square/Cube/to the power of X
 - [ ] Factorial

@@ -3,6 +3,7 @@ import type {
     BinaryOperator,
     Identifier,
     IdentifierName,
+    SignedOperator,
     UnaryOperator,
 } from "./types";
 
@@ -13,10 +14,11 @@ export abstract class Expr {
 
 export interface ExprVisitor<R> {
     visitBinaryExpr(expr: BinaryExpr): R;
+    visitUnaryExpr(expr: UnaryExpr): R;
     visitGroupingExpr(expr: GroupingExpr): R;
     visitExponentialExpr(expr: ExponentialExpr): R;
     visitNumberExpr(expr: NumberLiteralExpr): R;
-    visitUnaryExpr(expr: UnaryExpr): R;
+    visitSignedExpr(expr: SignedExpr): R;
     visitVariableExpr(expr: VariableExpr): R;
 }
 
@@ -44,6 +46,25 @@ export class BinaryExpr extends Expr {
         return `(Binary ${this.left.toString()} ${
             this.operator?.lexeme ?? "null"
         } ${this.right.toString()})`;
+    }
+}
+
+export class UnaryExpr extends Expr {
+    expression: Expr;
+    operator: Token<UnaryOperator>;
+
+    constructor(expression: Expr, operator: Token<UnaryOperator>) {
+        super();
+        this.expression = expression;
+        this.operator = operator;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitUnaryExpr(this);
+    }
+
+    toString(): string {
+        return `(Unary ${this.operator.lexeme} ${this.expression.toString()})`;
     }
 }
 
@@ -99,22 +120,22 @@ export class NumberLiteralExpr extends Expr {
     }
 }
 
-export class UnaryExpr extends Expr {
-    operator: Token<UnaryOperator>;
+export class SignedExpr extends Expr {
+    operator: Token<SignedOperator>;
     right: Expr;
 
-    constructor(operator: Token<UnaryOperator>, right: Expr) {
+    constructor(operator: Token<SignedOperator>, right: Expr) {
         super();
         this.operator = operator;
         this.right = right;
     }
 
     accept<R>(visitor: ExprVisitor<R>): R {
-        return visitor.visitUnaryExpr(this);
+        return visitor.visitSignedExpr(this);
     }
 
     toString(): string {
-        return `(Unary ${this.operator.lexeme} ${this.right.toString()})`;
+        return `(Signed ${this.operator.lexeme} ${this.right.toString()})`;
     }
 }
 

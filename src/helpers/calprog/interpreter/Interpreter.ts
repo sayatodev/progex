@@ -18,10 +18,11 @@ import type {
     Expr,
     GroupingExpr,
     NumberLiteralExpr,
-    UnaryExpr,
+    SignedExpr,
     VariableExpr,
     ExprVisitor,
     ExponentialExpr,
+    UnaryExpr,
 } from "./Expr";
 import type Token from "./Token";
 import type { ErrorName, Value } from "./types";
@@ -74,7 +75,7 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         return this.evaluate(expr.expression);
     }
 
-    visitUnaryExpr(expr: UnaryExpr): Value {
+    visitSignedExpr(expr: SignedExpr): Value {
         const right = this.evaluate(expr.right);
         this.checkNumberOperand(expr.operator, right);
 
@@ -84,6 +85,30 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 return -right;
             case TokenType.PLUS:
                 return right;
+            default:
+                throw new CalcSyntaxError(
+                    expr.operator,
+                    "Unexpected operator: " + expr.operator.lexeme
+                );
+        }
+    }
+
+    visitUnaryExpr(expr: UnaryExpr): number {
+        const value = this.evaluate(expr.expression);
+        this.checkNumberOperand(expr.operator, value);
+
+        switch (expr.operator.type) {
+            case TokenType.INVERSE:
+                return 1 / value;
+            case TokenType.SQUARE:
+                return Math.pow(value, 2);
+            case TokenType.CUBE:
+                return Math.pow(value, 3);
+            default:
+                throw new CalcSyntaxError(
+                    expr.operator,
+                    "Unexpected operator: " + expr.operator.lexeme
+                );
         }
     }
 

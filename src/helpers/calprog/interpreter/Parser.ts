@@ -4,9 +4,10 @@ import {
     BinaryExpr,
     GroupingExpr,
     NumberLiteralExpr,
-    UnaryExpr,
+    SignedExpr,
     VariableExpr,
     ExponentialExpr,
+    UnaryExpr,
 } from "./Expr";
 import {
     AssignmentStmt,
@@ -18,10 +19,10 @@ import {
 import Token from "./Token";
 import {
     EqualityOperator,
+    ExponentOperator,
     Identifier,
-    IdentifierName,
     IdentifierToken,
-    UnaryOperator,
+    SignedOperator,
     VariableName,
 } from "./types";
 
@@ -125,27 +126,60 @@ export default class Parser {
     }
 
     private factor(): Expr {
-        let expr = this.unary();
+        let expr = this.signed();
 
         while (
-            this.match(TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION)
+            this.check(
+                ...[TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION],
+                ...[TokenType.VARIABLE, TokenType.CONSTANT]
+            )
         ) {
-            const operator = this.previous() as Token<EqualityOperator>;
-            const right = this.unary();
-            expr = new BinaryExpr(expr, operator, right);
+            const type = this.peek().type;
+            switch (type) {
+                case TokenType.MULTIPLY:
+                case TokenType.DIVIDE:
+                case TokenType.FRACTION:
+                    const operator = this.consume(
+                        [
+                            TokenType.MULTIPLY,
+                            TokenType.DIVIDE,
+                            TokenType.FRACTION,
+                        ],
+                        "Expect factor operator"
+                    );
+                    expr = new BinaryExpr(expr, operator, this.signed());
+                    break;
+                case TokenType.VARIABLE:
+                case TokenType.CONSTANT:
+                    expr = new BinaryExpr(expr, null, this.signed() as Expr);
+                    break;
+            }
         }
 
         return expr;
     }
 
-    private unary(): Expr {
+    private signed(): Expr {
         if (this.match(TokenType.MINUS, TokenType.PLUS, TokenType.NEGATIVE)) {
-            const operator = this.previous() as Token<UnaryOperator>;
-            const right = this.unary();
-            return new UnaryExpr(operator, right);
+            const operator = this.previous() as Token<SignedOperator>;
+            const right = this.signed();
+            return new SignedExpr(operator, right);
         }
 
-        return this.primary();
+        return this.unary();
+    }
+
+    private unary(): Expr {
+        let expr = this.primary();
+
+        while (
+            this.match(TokenType.INVERSE, TokenType.SQUARE, TokenType.CUBE)
+        ) {
+            const operator = this.previous() as Token<ExponentOperator>;
+            expr = new UnaryExpr(expr, operator);
+        }
+
+        return expr;
     }
 
     private primary(): Expr {
@@ -158,34 +192,12 @@ export default class Parser {
                 );
                 return new ExponentialExpr(literal, exponent.literal as number);
             }
-            let expr: Expr = new NumberLiteralExpr(literal as number);
-
-            // Handle chained variables or constants (e.g. 4AB, 3AB)
-            while (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
-                const rightIdentifier = this.previous() as IdentifierToken;
-                const right = new VariableExpr(
-                    rightIdentifier,
-                    rightIdentifier.lexeme
-                );
-                expr = new BinaryExpr(expr, null, right);
-            }
-            return expr;
+            return new NumberLiteralExpr(literal as number);
         }
 
         if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
             const identifier = this.previous() as IdentifierToken;
-            let expr: Expr = new VariableExpr(identifier, identifier.lexeme);
-
-            // Handle chained variables or constants (e.g., AB = A*B)
-            while (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
-                const rightIdentifier = this.previous() as IdentifierToken;
-                const right = new VariableExpr(
-                    rightIdentifier,
-                    rightIdentifier.lexeme as IdentifierName
-                );
-                expr = new BinaryExpr(expr, null, right);
-            }
-            return expr;
+            return new VariableExpr(identifier, identifier.lexeme);
         }
 
         if (this.match(TokenType.LEFT_PARENTHESIS)) {
