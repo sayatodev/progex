@@ -23,11 +23,19 @@ import type {
     ExprVisitor,
     ExponentialExpr,
     UnaryExpr,
+    FunctionCallExpr,
 } from "./Expr";
 import type Token from "./Token";
 import type { ErrorName, Value } from "./types";
 import { Environment } from "./Environment";
-import { combination, factorial, permutation } from "@/helpers/math";
+import {
+    combination,
+    cos,
+    factorial,
+    permutation,
+    sin,
+    tan,
+} from "@/helpers/math";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     private readonly environment: Environment = new Environment();
@@ -76,10 +84,16 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
             Number.isInteger(operand)
         )
             return;
-        throw new MathError(
-            operator,
-            "Operand must be a positive integer."
-        );
+        throw new MathError(operator, "Operand must be a positive integer.");
+    }
+
+    private checkArgumentsCount(args: Value[], expected: number): void {
+        if (args.length !== expected) {
+            throw new CalcSyntaxError(
+                null,
+                `Expected ${expected} arguments, but got ${args.length}.`
+            );
+        }
     }
 
     /* Expr Visitors */
@@ -106,6 +120,34 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 throw new CalcSyntaxError(
                     expr.operator,
                     "Unexpected operator: " + expr.operator.lexeme
+                );
+        }
+    }
+
+    visitFunctionCallExpr(expr: FunctionCallExpr): number {
+        const values = expr.args.map((arg) => this.evaluate(arg));
+        const type = expr.fn.type;
+
+        switch (type) {
+            case TokenType.ABS:
+                this.checkArgumentsCount(values, 1);
+                return Math.abs(values[0]);
+            case TokenType.POLAR:
+                this.checkArgumentsCount(values, 2);
+                return Math.sqrt(values[0] ** 2 + values[1] ** 2);
+            case TokenType.SIN:
+                this.checkArgumentsCount(values, 1);
+                return sin(this.environment.setup, values[0]);
+            case TokenType.COS:
+                this.checkArgumentsCount(values, 1);
+                return cos(this.environment.setup, values[0]);
+            case TokenType.TAN:
+                this.checkArgumentsCount(values, 1);
+                return tan(this.environment.setup, values[0]);
+            default:
+                throw new CalcSyntaxError(
+                    expr.fn,
+                    "Unexpected function: " + expr.fn.lexeme
                 );
         }
     }

@@ -8,6 +8,7 @@ import {
     VariableExpr,
     ExponentialExpr,
     UnaryExpr,
+    FunctionCallExpr,
 } from "./Expr";
 import {
     AssignmentStmt,
@@ -21,11 +22,17 @@ import {
     CombinatorialOperator,
     EqualityOperator,
     ExponentOperator,
+    FunctionIdentifier,
     Identifier,
     IdentifierToken,
     SignedOperator,
     VariableName,
 } from "./types";
+
+const FUNCTIONS = [
+    ...[TokenType.ABS, TokenType.POLAR],
+    ...[TokenType.SIN, TokenType.COS, TokenType.TAN],
+];
 
 export default class Parser {
     private readonly tokens: Token[];
@@ -132,7 +139,9 @@ export default class Parser {
         while (
             this.check(
                 ...[TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.FRACTION],
-                ...[TokenType.VARIABLE, TokenType.CONSTANT]
+                /* Chainable symbols (Treated as multiplication) */
+                ...[TokenType.VARIABLE, TokenType.CONSTANT],
+                ...FUNCTIONS
             )
         ) {
             const type = this.peek().type;
@@ -150,10 +159,25 @@ export default class Parser {
                     );
                     expr = new BinaryExpr(expr, operator, this.signed());
                     break;
+                /* Chaining identifiers */
                 case TokenType.VARIABLE:
                 case TokenType.CONSTANT:
                     expr = new BinaryExpr(expr, null, this.signed() as Expr);
                     break;
+                /* Chaining function calls */
+                case TokenType.ABS:
+                case TokenType.POLAR:
+                case TokenType.SIN:
+                case TokenType.COS:
+                case TokenType.TAN:
+                    expr = new BinaryExpr(expr, null, this.signed() as Expr);
+                    break;
+                /* Supposedly unreachable */
+                default:
+                    throw this.create_error(
+                        this.peek(),
+                        `Unexpected token #${this.peek().type} for factor.`
+                    );
             }
         }
 
@@ -181,8 +205,7 @@ export default class Parser {
     }
 
     private unary(): Expr {
-        let expr = this.primary();
-
+        let expr = this.functionCall();
         while (
             this.match(
                 ...[TokenType.INVERSE, TokenType.SQUARE, TokenType.CUBE],
@@ -194,6 +217,28 @@ export default class Parser {
         }
 
         return expr;
+    }
+
+    private functionCall(): Expr {
+        if (this.match(...FUNCTIONS)) {
+            const fn = this.previous() as Token<FunctionIdentifier>;
+            const args: Expr[] = [];
+            while (
+                !this.check(TokenType.RIGHT_PARENTHESIS) &&
+                !this.isAtEnd()
+            ) {
+                do {
+                    args.push(this.expression());
+                } while (this.match(TokenType.COMMA));
+            }
+
+            this.consume(
+                TokenType.RIGHT_PARENTHESIS,
+                `Expect ')' after function arguments.`
+            );
+            return new FunctionCallExpr(fn, args);
+        }
+        return this.primary();
     }
 
     private primary(): Expr {

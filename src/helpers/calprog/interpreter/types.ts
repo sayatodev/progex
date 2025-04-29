@@ -1,5 +1,5 @@
 import type { SymbolValue } from "@/data/programSymbols/generatedEnums";
-import type { TokenType } from "./enums";
+import { TokenType } from "./enums";
 import type Token from "./Token";
 
 // Token types that are used in expressions
@@ -43,6 +43,13 @@ export type UnaryOperator =
     | ExponentOperator
     | TokenType.FACTORIAL
     | TokenType.PERCENT;
+
+export type FunctionIdentifier =
+    | TokenType.ABS
+    | TokenType.POLAR
+    | TokenType.SIN
+    | TokenType.COS
+    | TokenType.TAN;
 
 export type Identifier = TokenType.CONSTANT | TokenType.VARIABLE;
 export type Terminator = TokenType.DISPLAY | TokenType.COLON | TokenType.EOP;

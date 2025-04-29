@@ -1,6 +1,7 @@
 import Token from "./Token";
 import type {
     BinaryOperator,
+    FunctionIdentifier,
     Identifier,
     IdentifierName,
     SignedOperator,
@@ -20,6 +21,7 @@ export interface ExprVisitor<R> {
     visitNumberExpr(expr: NumberLiteralExpr): R;
     visitSignedExpr(expr: SignedExpr): R;
     visitVariableExpr(expr: VariableExpr): R;
+    visitFunctionCallExpr(expr: FunctionCallExpr): R;
 }
 
 export class BinaryExpr extends Expr {
@@ -65,6 +67,25 @@ export class UnaryExpr extends Expr {
 
     toString(): string {
         return `(Unary ${this.operator.lexeme} ${this.expression.toString()})`;
+    }
+}
+
+export class FunctionCallExpr extends Expr {
+    fn: Token<FunctionIdentifier>;
+    args: Expr[];
+
+    constructor(name: Token<FunctionIdentifier>, args: Expr[]) {
+        super();
+        this.fn = name;
+        this.args = args;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitFunctionCallExpr(this);
+    }
+
+    toString(): string {
+        return `(FunctionCall ${this.fn.lexeme} [${this.args.join(",")}])`;
     }
 }
 

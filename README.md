@@ -34,9 +34,9 @@ The interpreter is highly influenced by [Crafting Interpreters](https://crafting
 - [x] Percent
 - [x] Permutation, Combination
 - [x] Assignment
-- [ ] Absolute
-- [ ] Polar
-- [ ] Square root, log, ln
+- [x] Absolute
+- [x] Polar
+- [x] Square root, log, ln
 - [ ] Sin/cos/tan
 - [ ] Arc sin/cos/tan
 - [ ] Comparisons (GTE/LTE/GT/LT/EQ/NEQ)

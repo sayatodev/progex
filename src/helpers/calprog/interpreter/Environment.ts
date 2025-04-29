@@ -25,6 +25,7 @@ export class Environment {
     );
     private readonly constants: Record<ConstantName, Value> = CONSTANTS;
     result: Value = 0;
+    setup: "RAD" | "DEG" = "DEG";
 
     constructor() {}
 
