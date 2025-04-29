@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { CopyProgramCodeButton } from "./copyCodeButton";
 import Footer from "@/app/footer";
+import { notFound } from "next/navigation";
 
 interface Props {
     params: Promise<{ program_name: string }>;
@@ -11,10 +12,23 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { program_name } = await params;
+    const data: ProgramData = await import(
+        "@/data/presetPrograms/" + program_name + ".json"
+    );
+    if (!data) {
+        return {
+            openGraph: {
+                title: "Progex - Not found",
+                description: "Progex - Not found",
+                url: "https://progex.com/view/preset/" + program_name,
+                siteName: "Progex",
+            },
+        };
+    }
     return {
         openGraph: {
-            title: "Progex - " + program_name,
-            description: "Progex - " + program_name,
+            title: "Progex - " + data.title,
+            description: "Calculator program for" + data.title,
             url: "https://progex.com/view/preset/" + program_name,
             siteName: "Progex",
         },
@@ -27,8 +41,9 @@ export default async function Home({ params }: Props) {
         const data: ProgramData = await import(
             "@/data/presetPrograms/" + program_name + ".json"
         );
-        const program = new Program(data.program);
+        if (!data) return notFound();
 
+        const program = new Program(data.program);
         return (
             <main className="flex min-h-screen flex-col items-center gap-3 p-4 md:p-24">
                 <Link href="/view/preset">Back</Link>
@@ -47,12 +62,6 @@ export default async function Home({ params }: Props) {
         );
     } catch (error) {
         console.error("Error loading data:", error);
-        return (
-            <main className="flex min-h-screen flex-col items-center gap-3 p-24">
-                <h1 className="text-4xl font-bold">Error</h1>
-                <p>Data not found</p>
-                <Footer />
-            </main>
-        );
+        return notFound();
     }
 }
