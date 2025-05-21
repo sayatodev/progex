@@ -1,0 +1,12 @@
+.button {
+    box-shadow: 2px 2px 5px black;
+    font-size: 1.5rem;
+    font-weight: medium;
+    padding: 0.25em 1em;
+}
+
+.button:hover {
+    background-color: #fef3c6;
+    cursor: pointer;
+    transition-duration: 200ms;
+}
