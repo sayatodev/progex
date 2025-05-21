@@ -5,11 +5,13 @@ import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
 import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
 import { Value } from "@/helpers/calprog/interpreter/Value";
+import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function debug(program: string, inputs: string[] = []) {
     console.clear();
 
+    //@ts-expect-error This is a workaround to allow direct access of the variable at browser console.
     window.Value = Value;
 
     for (const input of inputs) {
@@ -37,6 +39,8 @@ function debug(program: string, inputs: string[] = []) {
 }
 
 export default function DebugPage() {
+    if (process.env.NODE_ENV !== "development") notFound();
+
     const [program, setProgram] = useState<string>(
         "?→A:?→B:?→C:?→D:?→X:?→Y:AX-DB→M:(CX-YB)┘M→X◢(AY-DC)┘M→Y"
     );
