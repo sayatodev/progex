@@ -34,7 +34,7 @@ export class Environment {
     result: Value = Value.from(0);
     setup: "RAD" | "DEG" = "DEG";
     inputs: Value[] = [];
-    private displayCallback = (result: Value) => {
+    displayCallback = (result: Value) => {
         console.log("DISPLAY->", result.toString());
     };
 
