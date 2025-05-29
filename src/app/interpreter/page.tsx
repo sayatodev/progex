@@ -5,7 +5,6 @@ import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
 import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
 import { Value } from "@/helpers/calprog/interpreter/Value";
-import { notFound } from "next/navigation";
 import { useEffect, useState } from "react";
 import Footer from "../footer";
 import Link from "next/link";
@@ -36,8 +35,6 @@ function runProgram(
 }
 
 export default function DebugPage() {
-    if (process.env.NODE_ENV !== "development") notFound();
-
     const [program, setProgram] = useState<string>(
         "?→A:?→B:?→C:?→D:?→X:?→Y:AX-DB→M:(CX-YB)┘M→X◢(AY-DC)┘M→Y"
     );
