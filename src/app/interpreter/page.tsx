@@ -46,9 +46,13 @@ export default function DebugPage() {
         setResults([]); // Clear previous results
         setError(null); // Clear previous errors
         try {
-            runProgram(program, inputs, (result: Value) => {
-                setResults((prevResults) => [...prevResults, result]);
-            });
+            runProgram(
+                program.replaceAll("\n", ""),
+                inputs,
+                (result: Value) => {
+                    setResults((prevResults) => [...prevResults, result]);
+                }
+            );
         } catch (error) {
             if (error instanceof RuntimeError) {
                 setError(
@@ -57,25 +61,31 @@ export default function DebugPage() {
                         `(${error.token?.lexeme})`
                 );
             } else {
-                setError("An unexpected error occurred.");
+                setError(`${error}`);
             }
         }
     }, [program, inputs]);
 
     useEffect(() => {
-        const tokens = new Scanner(program).scan();
-        const inputLength = Scanner.getInputLength(tokens);
+        try {
+            const tokens = new Scanner(program.replaceAll("\n", "")).scan();
+            const inputLength = Scanner.getInputLength(tokens);
 
-        setInputs(Array(inputLength).fill(0));
+            setInputs(Array(inputLength).fill(0));
+        } catch (error) {
+            console.warn("Failed to initialize inputs:", error);
+        }
     }, [program]);
 
     return (
-        <main className="flex min-h-screen flex-col items-center gap-5 p-24">
+        <main className="flex min-h-screen flex-col items-center gap-5 p-4 md:p-24">
             <Link href="/">Back</Link>
-            <h1 className="text-4xl font-bold">Progex Interpreter (Beta)</h1>
+            <h1 className="text-4xl font-bold text-center">
+                Progex Interpreter (Beta)
+            </h1>
 
             <div className="flex flex-row w-full flex-wrap mt-4 gap-2">
-                <div className="flex-7 mt-4 flex flex-col min-h-[25em] bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 font-mono">
+                <div className="min-w-full md:min-w-0 flex-7 mt-4 flex flex-col min-h-[25em] bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 font-mono">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                         Program
                     </h2>
@@ -111,7 +121,7 @@ export default function DebugPage() {
                     <ul className="">
                         {results.map((result, index) => (
                             <li key={index} className="mb-2">
-                                {result.toString()}
+                                {result.toString().replace(/\.?0+$/, "")}
                             </li>
                         ))}
                         {error && <li className="text-red-500">{error}</li>}

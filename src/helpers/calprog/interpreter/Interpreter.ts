@@ -85,15 +85,19 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
     }
 
     private checkArgumentsCount(
+        token: Token,
         args: Value[],
         expected_min: number,
         expected_max?: number
     ): void {
-        if (!expected_max) expected_max = expected_min;
-        if (args.length < expected_min || args.length > expected_max) {
+        const min = expected_min < 0 ? 0 : expected_min;
+        const max = expected_max ?? expected_min;
+        if (args.length < min || args.length > max) {
             throw new CalcSyntaxError(
-                null,
-                `Expected ${expected_min} to ${expected_max} arguments, but got ${args.length}.`
+                token,
+                `Expected ${min} ${
+                    expected_max ? ` to ${max}` : ""
+                } argument(s), but got ${args.length}.`
             );
         }
     }
@@ -135,45 +139,45 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
 
         switch (type) {
             case TokenType.ABS:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].abs();
             case TokenType.POLAR:
-                this.checkArgumentsCount(values, 2);
+                this.checkArgumentsCount(expr.fn, values, 2);
                 return values[0].square().add(values[1].square()).sqrt();
             case TokenType.SIN:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].sin(this.environment.setup);
             // return calprog.sin(this.environment.setup, values[0].number());
             case TokenType.COS:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].cos(this.environment.setup);
             case TokenType.TAN:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].tan(this.environment.setup);
             case TokenType.ARC_SIN:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].asin(this.environment.setup);
             case TokenType.ARC_COS:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].acos(this.environment.setup);
             case TokenType.ARC_TAN:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].atan(this.environment.setup);
             case TokenType.LOG:
-                this.checkArgumentsCount(values, 1, 2);
+                this.checkArgumentsCount(expr.fn, values, 1, 2);
                 if (values.length === 1) {
                     return values[0].log();
                 } else {
                     return values[1].log_x(values[0]);
                 }
             case TokenType.LN:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].ln();
             case TokenType.SQRT:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].sqrt();
             case TokenType.CUBE_ROOT:
-                this.checkArgumentsCount(values, 1);
+                this.checkArgumentsCount(expr.fn, values, 1);
                 return values[0].cbrt();
             default:
                 throw new CalcSyntaxError(
@@ -363,8 +367,6 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
         } catch (error) {
             if (error instanceof RuntimeError) {
                 this.error(error.name, error.token, error.message);
-            } else if (error instanceof CalcSyntaxError) {
-                console.error(error.message);
             }
         } finally {
             this.display();
