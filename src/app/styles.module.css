@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap");
+
 .button {
     box-shadow: 2px 2px 5px black;
     font-size: 1.5rem;
@@ -9,4 +11,10 @@
     background-color: #fef3c6;
     cursor: pointer;
     transition-duration: 200ms;
+}
+
+.firacode {
+    font-family: "Fira Code", monospace;
+    font-optical-sizing: auto;
+    font-style: normal;
 }

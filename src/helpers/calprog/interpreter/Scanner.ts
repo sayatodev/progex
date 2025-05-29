@@ -230,6 +230,13 @@ export default class Scanner {
 
         const value = this.program.substring(this.start, this.current);
         this.addToken(TokenType.NUMBER, Value.from(value));
-        // TODO: Create custom float class to simulate calculator float
+    }
+
+    public static getInputLength(tokens: Token[]): number {
+        const inputToken = tokens.filter(
+            (token) => token.type === TokenType.INPUT
+        );
+
+        return inputToken.length;
     }
 }

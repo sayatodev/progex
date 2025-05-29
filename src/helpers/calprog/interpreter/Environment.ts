@@ -20,6 +20,11 @@ const CONSTANTS: Record<ConstantName, Value> = {
     [SymbolValue.E]: new Value(Decimal.exp(1)),
 };
 
+type EnvironmentConfig = {
+    inputs: string[];
+    displayCallback: (value: Value) => void;
+};
+
 export class Environment {
     private readonly variables: Record<VariableName, Value> = initiateRecord(
         variableNames,
@@ -28,6 +33,10 @@ export class Environment {
     private readonly constants: Record<ConstantName, Value> = CONSTANTS;
     result: Value = Value.from(0);
     setup: "RAD" | "DEG" = "DEG";
+    inputs: Value[] = [];
+    private displayCallback = (result: Value) => {
+        console.log("DISPLAY->", result.toString());
+    };
 
     constructor() {}
 
@@ -62,5 +71,42 @@ export class Environment {
     mDecrement(value: Value): void {
         this.variables[SymbolValue.M] =
             this.variables[SymbolValue.M].sub(value);
+    }
+
+    setInput(index: number, value: Value): void {
+        if (!this.inputs.length) {
+            throw new Error("Inputs have not been initialized.");
+        }
+        if (index >= 0 && index < this.inputs.length) {
+            this.inputs[index] = value;
+        }
+    }
+
+    getInput(): Value {
+        if (!this.inputs.length) {
+            throw new Error("Inputs have not been initialized.");
+        }
+        return this.inputs.shift() || Value.from(0);
+    }
+
+    /* Configuration */
+
+    setDisplayCallback(callback: (value: Value) => void): void {
+        this.displayCallback = callback;
+    }
+
+    initiateInputLength(length: number): void {
+        this.inputs = Array.from({ length }, () => Value.from(0));
+    }
+
+    setInputs(inputs: Value[]): void {
+        this.inputs = inputs;
+    }
+
+    /* Quick initializer */
+    config({ inputs, displayCallback }: EnvironmentConfig): void {
+        this.initiateInputLength(inputs?.length || 0);
+        this.setInputs(inputs.map((input) => Value.from(input)));
+        this.setDisplayCallback(displayCallback);
     }
 }

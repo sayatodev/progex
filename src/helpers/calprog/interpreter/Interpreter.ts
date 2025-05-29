@@ -24,6 +24,7 @@ import type {
     ExponentialExpr,
     UnaryExpr,
     FunctionCallExpr,
+    InputExpr,
 } from "./Expr";
 import Token from "./Token";
 import type { ErrorName } from "./types";
@@ -31,7 +32,7 @@ import { Environment } from "./Environment";
 import { Value } from "./Value";
 
 export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
-    private readonly environment: Environment = new Environment();
+    readonly environment: Environment = new Environment();
 
     constructor() {}
 
@@ -55,7 +56,7 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
 
     private display(): void {
         const result = this.environment.result;
-        console.log("DISPLAY->", result.toString());
+        this.environment.displayCallback(result);
     }
 
     /* Checkers */
@@ -290,6 +291,11 @@ export class Interpreter implements ExprVisitor<Value>, StmtVisitor<void> {
                 `Undefined variable ${expr.name.lexeme}.`
             );
         }
+        return value;
+    }
+
+    visitInputExpr(_expr: InputExpr): Value {
+        const value = this.environment.getInput();
         return value;
     }
 

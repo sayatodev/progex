@@ -1,4 +1,5 @@
 import Token from "./Token";
+import type { TokenType } from "./enums";
 import type {
     BinaryOperator,
     FunctionIdentifier,
@@ -23,6 +24,7 @@ export interface ExprVisitor<R> {
     visitSignedExpr(expr: SignedExpr): R;
     visitVariableExpr(expr: VariableExpr): R;
     visitFunctionCallExpr(expr: FunctionCallExpr): R;
+    visitInputExpr(expr: InputExpr): R;
 }
 
 export class BinaryExpr extends Expr {
@@ -177,5 +179,22 @@ export class VariableExpr extends Expr {
 
     toString(): string {
         return `(Variable ${this.name.lexeme})`;
+    }
+}
+
+export class InputExpr extends Expr {
+    name: Token<TokenType.INPUT>;
+
+    constructor(name: Token<TokenType.INPUT>) {
+        super();
+        this.name = name;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitInputExpr(this);
+    }
+
+    toString(): string {
+        return `(INPUT)`;
     }
 }

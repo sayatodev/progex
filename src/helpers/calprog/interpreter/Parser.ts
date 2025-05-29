@@ -9,6 +9,7 @@ import {
     ExponentialExpr,
     UnaryExpr,
     FunctionCallExpr,
+    InputExpr,
 } from "./Expr";
 import {
     AssignmentStmt,
@@ -278,6 +279,10 @@ export default class Parser {
         if (this.match(TokenType.VARIABLE, TokenType.CONSTANT)) {
             const identifier = this.previous() as IdentifierToken;
             return new VariableExpr(identifier, identifier.lexeme);
+        }
+
+        if (this.match(TokenType.INPUT)) {
+            return new InputExpr(this.previous() as Token<TokenType.INPUT>);
         }
 
         if (this.match(TokenType.LEFT_PARENTHESIS)) {
