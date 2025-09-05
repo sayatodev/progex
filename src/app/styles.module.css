@@ -1,14 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap");
 
 .button {
-    box-shadow: 2px 2px 5px black;
-    font-size: 1.5rem;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    border: 1px solid #ddd;
+    font-size: 1.2rem;
     font-weight: medium;
-    padding: 0.25em 1em;
+    padding: 0.3em 1.2em;
+    border-radius: 0.5em;
 }
 
 .button:hover {
-    background-color: #fef3c6;
+    background-color: #eee;
     cursor: pointer;
     transition-duration: 200ms;
 }

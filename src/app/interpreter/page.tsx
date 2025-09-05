@@ -85,8 +85,8 @@ export default function DebugPage() {
             </h1>
 
             <div className="flex flex-row w-full flex-wrap mt-4 gap-2">
-                <div className="min-w-full md:min-w-0 flex-7 mt-4 flex flex-col min-h-[25em] bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 font-mono">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                <div className="min-w-full md:min-w-0 flex-7 mt-4 flex flex-col min-h-[25em] bg-white rounded-lg shadow-md p-4 font-mono">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
                         Program
                     </h2>
                     <textarea
@@ -95,8 +95,8 @@ export default function DebugPage() {
                         className={`${styles.firacode} w-full h-full p-2 border border-gray-300 rounded-md font-mono`}
                     />
                 </div>
-                <div className="flex-3 mt-4 max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                <div className="flex-3 mt-4 max-w-2xl bg-white rounded-lg shadow-md p-4">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
                         Inputs
                     </h2>
                     {inputs.map((_, index) => (
@@ -114,8 +114,8 @@ export default function DebugPage() {
                         />
                     ))}
                 </div>
-                <div className="min-w-full max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 overflow-y-auto h-[25em]">
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+                <div className="min-w-full max-w-2xl bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[25em]">
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
                         Results
                     </h2>
                     <ul className="">

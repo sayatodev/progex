@@ -5,7 +5,7 @@ export default function Footer() {
         <footer className="flex justify-center items-center h-16">
             <Link
                 href="https://github.com/sayatodev/progex"
-                className="text-black dark:text-white"
+                className="text-black"
             >
                 View on GitHub
             </Link>
