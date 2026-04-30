@@ -122,17 +122,6 @@ function classify(type: TokenType): HighlightTokenKind {
     return "plain";
 }
 
-function splitWithNewlines(text: string, kind: HighlightTokenKind): HighlightSegment[] {
-    if (!text.includes("\n")) {
-        return [{ text, kind }];
-    }
-
-    return text.split(/(\n)/).filter(Boolean).map((part) => ({
-        text: part,
-        kind: part === "\n" ? "plain" : kind,
-    }));
-}
-
 export function tokenizeCalculatorProgram(program: string): HighlightSegment[] {
     const normalized = normalizeEditorProgram(program);
     const lines = normalized.split("\n");
