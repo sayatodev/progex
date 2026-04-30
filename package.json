@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "npx tsx tests/interpreter-webcal.test.ts"
   },
   "dependencies": {
     "@types/decimal.js": "^7.4.3",

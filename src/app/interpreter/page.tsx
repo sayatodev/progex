@@ -4,7 +4,8 @@ import { RuntimeError } from "@/helpers/calprog/interpreter/Errors";
 import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
 import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
-import { Value } from "@/helpers/calprog/interpreter/Value";
+import { RuntimeValue } from "@/helpers/calprog/interpreter/Value";
+import type { ExecutionConfig } from "@/helpers/calprog/interpreter/runtime";
 import { useEffect, useState } from "react";
 import Footer from "../footer";
 import Link from "next/link";
@@ -14,7 +15,8 @@ import styles from "@/app/styles.module.css";
 function runProgram(
     program: string,
     inputs: string[] = [],
-    displayCallback: (result: Value) => void
+    displayCallback: (result: RuntimeValue) => void,
+    config: ExecutionConfig = {}
 ) {
     console.debug("Parsing", program);
 
@@ -29,6 +31,7 @@ function runProgram(
     interpreter.environment.config({
         inputs,
         displayCallback,
+        ...config,
     });
 
     interpreter.interpret(statements);
@@ -39,7 +42,7 @@ export default function DebugPage() {
         "?→A:?→B:?→C:?→D:?→X:?→Y:AX-DB→M:(CX-YB)┘M→X◢(AY-DC)┘M→Y"
     );
     const [inputs, setInputs] = useState<string[]>([]);
-    const [results, setResults] = useState<Value[]>([]);
+    const [results, setResults] = useState<RuntimeValue[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -49,7 +52,7 @@ export default function DebugPage() {
             runProgram(
                 program.replaceAll("\n", ""),
                 inputs,
-                (result: Value) => {
+                (result: RuntimeValue) => {
                     setResults((prevResults) => [...prevResults, result]);
                 }
             );
