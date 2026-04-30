@@ -2,6 +2,28 @@
 (Under development)  
 The All-in-one tool for Calculator Programs. Designed for Casio fx-50fh ii.
 
+## Tooling
+This repository now uses Bun as its package manager and default script runner.
+
+Install dependencies with `bun install`.
+
+Common commands:
+
+- `bun run dev`
+- `bun run build`
+- `bun run start`
+- `bun run test`
+- `bun run typecheck`
+
+### TypeScript setup
+The repository includes `@typescript/native-preview` so `bun run typecheck` uses `tsgo` for a separate no-emit typecheck.
+
+`typescript` is still kept in `devDependencies` because current Next.js releases still load the classic TypeScript package internally for their own config and build-time type tooling. In practice, that means:
+
+- Next commands run through Bun
+- standalone typechecking runs through `tsgo`
+- Next's internal TypeScript integration still depends on `typescript`
+
 ## Current Features
 * View preset programs in a modern interface
 * View guides for inputting different tokens on calculator

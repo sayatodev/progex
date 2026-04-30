@@ -133,6 +133,7 @@ export function tokenizeCalculatorProgram(program: string): HighlightSegment[] {
         try {
             const tokens = new Scanner(line).scan();
             let cursor = 0;
+            const functionDepthStack: boolean[] = [];
 
             for (const token of tokens) {
                 if (token.type === TokenType.EOP) {
@@ -152,9 +153,21 @@ export function tokenizeCalculatorProgram(program: string): HighlightSegment[] {
                     });
                 }
 
+                let kind = classify(token.type);
+                if (FUNCTION_TOKENS.has(token.type)) {
+                    functionDepthStack.push(true);
+                } else if (token.type === TokenType.LEFT_PARENTHESIS) {
+                    functionDepthStack.push(false);
+                } else if (token.type === TokenType.RIGHT_PARENTHESIS) {
+                    const fromFunction = functionDepthStack.pop();
+                    if (fromFunction) {
+                        kind = "function";
+                    }
+                }
+
                 lineSegments.push({
                     text: lexeme,
-                    kind: classify(token.type),
+                    kind,
                 });
                 cursor = start + lexeme.length;
             }

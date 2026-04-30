@@ -3,6 +3,7 @@ import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
 import Parser from "@/helpers/calprog/interpreter/Parser";
 import Scanner from "@/helpers/calprog/interpreter/Scanner";
 import { TokenType } from "@/helpers/calprog/interpreter/enums";
+import type Token from "@/helpers/calprog/interpreter/Token";
 import type { ExecutionConfig } from "@/helpers/calprog/interpreter/runtime";
 import { VARIABLE_NAMES } from "./constants";
 import type { ExecutionSnapshot } from "./types";
@@ -26,7 +27,7 @@ export function normalizeProgram(program: string): string {
     lines.forEach((line, index) => {
         segments.push(line);
         const isLastLine = index === lines.length - 1;
-        if (!isLastLine && !line.endsWith(":")) {
+        if (!isLastLine && !line.endsWith(":") && !line.endsWith("◢")) {
             segments.push(":");
         }
     });
@@ -35,7 +36,211 @@ export function normalizeProgram(program: string): string {
 }
 
 export function formatProgram(program: string): string {
-    return normalizeProgram(program).replace(/:/g, ":\n").trimEnd();
+    const normalized = normalizeProgram(program);
+    const tokens = new Scanner(normalized).scan();
+    const lines: string[] = [];
+    let currentLine = "";
+
+    const append = (text: string) => {
+        currentLine += text;
+    };
+
+    const pushLine = () => {
+        lines.push(currentLine.trimEnd());
+        currentLine = "";
+    };
+
+    const isBinarySpacingToken = (type: TokenType): boolean =>
+        [
+            TokenType.PLUS,
+            TokenType.MINUS,
+            TokenType.MULTIPLY,
+            TokenType.DIVIDE,
+            TokenType.FRACTION,
+            TokenType.PERMUTATION,
+            TokenType.COMBINATION,
+            TokenType.ASSIGN,
+            TokenType.GTE,
+            TokenType.LTE,
+            TokenType.GT,
+            TokenType.LT,
+            TokenType.EQ,
+            TokenType.NEQ,
+            TokenType.ARROW,
+            TokenType.TO,
+            TokenType.STEP,
+        ].includes(type);
+
+    const isUnarySignContext = (token: Token, previous: Token | null): boolean => {
+        if (
+            token.type !== TokenType.PLUS &&
+            token.type !== TokenType.MINUS
+        ) {
+            return false;
+        }
+
+        if (!previous || previous.type === TokenType.COLON) {
+            return true;
+        }
+
+        return [
+            TokenType.DISPLAY,
+            TokenType.LEFT_PARENTHESIS,
+            TokenType.COMMA,
+            TokenType.SEMICOLON,
+            TokenType.PLUS,
+            TokenType.MINUS,
+            TokenType.MULTIPLY,
+            TokenType.DIVIDE,
+            TokenType.FRACTION,
+            TokenType.X_POWER,
+            TokenType.X_ROOT,
+            TokenType.TO,
+            TokenType.STEP,
+            TokenType.GTE,
+            TokenType.LTE,
+            TokenType.GT,
+            TokenType.LT,
+            TokenType.EQ,
+            TokenType.NEQ,
+            TokenType.ARROW,
+            TokenType.ASSIGN,
+        ].includes(previous.type);
+    };
+
+    const isKeywordSpacingToken = (type: TokenType): boolean =>
+        [
+            TokenType.IF,
+            TokenType.THEN,
+            TokenType.ELSE,
+            TokenType.IF_END,
+            TokenType.FOR,
+            TokenType.NEXT,
+            TokenType.BREAK,
+            TokenType.WHILE,
+            TokenType.WHILE_END,
+            TokenType.GOTO,
+            TokenType.LABEL,
+            TokenType.CLR_MEMORY,
+            TokenType.CLR_STAT,
+            TokenType.FREQ_ON,
+        ].includes(type);
+
+    const isPostfixSeparatorToken = (type: TokenType): boolean =>
+        [TokenType.COMMA, TokenType.SEMICOLON].includes(type);
+
+    const shouldAddLeadingSpace = (
+        token: Token,
+        previous: Token | null
+    ): boolean => {
+        if (!previous || previous.type === TokenType.COLON) {
+            return false;
+        }
+
+        if (token.type === TokenType.DISPLAY) {
+            return true;
+        }
+
+        if (isUnarySignContext(token, previous)) {
+            return false;
+        }
+
+        if (isBinarySpacingToken(token.type) || isKeywordSpacingToken(token.type)) {
+            return true;
+        }
+
+        if (
+            token.type === TokenType.NUMBER &&
+            previous.type === TokenType.LABEL
+        ) {
+            return true;
+        }
+
+        if (
+            token.type === TokenType.NUMBER &&
+            previous.type === TokenType.GOTO
+        ) {
+            return true;
+        }
+
+        return false;
+    };
+
+    const shouldAddTrailingSpace = (
+        token: Token,
+        previous: Token | null,
+        next: Token | null
+    ): boolean => {
+        if (!next || next.type === TokenType.COLON || next.type === TokenType.EOP) {
+            return false;
+        }
+
+        if (isUnarySignContext(next, token)) {
+            return false;
+        }
+
+        if (token.type === TokenType.DISPLAY) {
+            return true;
+        }
+
+        if (isUnarySignContext(token, previous)) {
+            return false;
+        }
+
+        if (isBinarySpacingToken(token.type) || isKeywordSpacingToken(token.type)) {
+            return true;
+        }
+
+        if (
+            (token.type === TokenType.GOTO || token.type === TokenType.LABEL) &&
+            next.type === TokenType.NUMBER
+        ) {
+            return true;
+        }
+
+        if (isPostfixSeparatorToken(token.type)) {
+            return true;
+        }
+
+        return false;
+    };
+
+    for (let index = 0; index < tokens.length; index++) {
+        const token = tokens[index];
+        if (token.type === TokenType.EOP) {
+            break;
+        }
+
+        const previous = index > 0 ? tokens[index - 1] : null;
+        const next = index < tokens.length - 1 ? tokens[index + 1] : null;
+
+        if (token.type === TokenType.COLON) {
+            append(":");
+            pushLine();
+            continue;
+        }
+
+        if (shouldAddLeadingSpace(token, previous) && !currentLine.endsWith(" ")) {
+            append(" ");
+        }
+
+        append(token.lexeme.toString());
+
+        if (token.type === TokenType.DISPLAY) {
+            pushLine();
+            continue;
+        }
+
+        if (shouldAddTrailingSpace(token, previous, next)) {
+            append(" ");
+        }
+    }
+
+    if (currentLine.trim().length > 0) {
+        pushLine();
+    }
+
+    return lines.join("\n");
 }
 
 export function formatError(error: unknown): string {

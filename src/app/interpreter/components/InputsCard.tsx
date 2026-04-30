@@ -20,7 +20,9 @@ export default function InputsCard({
                             className="block text-sm text-gray-700"
                         >
                             <span className="mb-1 block text-xs text-gray-500">
-                                {inputLabels[index] ?? `Input ${index + 1}=`}
+                                {inputLabels[index]
+                                    ? `Input ${inputLabels[index]}`
+                                    : `Input ${index + 1} =`}
                             </span>
                             <input
                                 type="text"

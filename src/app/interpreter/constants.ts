@@ -31,10 +31,7 @@ export const EXECUTION_MODES: ExecutionMode[] = [
 
 export const ANGLE_MODES: AngleMode[] = ["DEG", "RAD"];
 
-export const REGRESSION_MODES: Array<RegressionMode | "NONE"> = [
-    "NONE",
-    "LIN",
-];
+export const REGRESSION_MODES: Array<RegressionMode | "NONE"> = ["NONE", "LIN"];
 
 export const EXAMPLES: InterpreterExample[] = [
     {
@@ -49,13 +46,20 @@ export const EXAMPLES: InterpreterExample[] = [
         program:
             "ClrMemory:\n?→X:\n?→Y:\n?→A:\nA⁻¹(Y-X→Y:\nFor 0→B To A:\nln(X:\nAns-.5Ans(B²=BA)M+:\nX+Y→X:\nNext:\nYM",
         inputs: ["1", "2", "10"],
-        config: { executionMode: "COMP", emitFinalResult: true },
+        config: { executionMode: "COMP" },
     },
     {
         label: "Weighted statistics",
         program: "ClrStat:\nFreqOn:\n1,2;5DT:\nmaxX◢:\nmaxY◢:\nΣx◢:\nΣy◢:\nn",
         inputs: [],
         config: { executionMode: "REG" },
+    },
+    {
+        label: "Circle centres",
+        program:
+            "FreqOn:? → A:? → B:? → C:? → D:? → X:? → Y:X, Y; Pol(A - C, B - DDT:Pol(C - maxX, D - maxY:√((A - maxX)² + (B - maxY)² → Y:(AX + CY + Σx) ┘ (X + Y + n ◢(BX + DY + Σy) ┘ (X + Y + n ◢(A + C + maxX) ┘ 3 ◢(B + D + maxY) ┘ 3 ◢(maxX - A) ┘ (B - maxY → M:D - MC → X:(C - A) ┘ (B - D:(maxY - AnsmaxX - X) ┘ (M - Ans → Y ◢YM + X → M ◢(A + C + maxX - Y) ┘ 2 → A ◢(B + D + maxY - M) ┘ 2 → B ◢Pol(A - C, B - D ◢-2A ◢-2B ◢A² + B² - X²",
+        inputs: ["4", "3", "0", "0", "4", "0"],
+        config: { executionMode: "SD" },
     },
 ];
 
@@ -81,7 +85,7 @@ export type InterpreterConfigState = {
 };
 
 export function buildExampleConfig(
-    config?: ExecutionConfig
+    config?: ExecutionConfig,
 ): InterpreterConfigState {
     return {
         executionMode: config?.executionMode ?? "AUTO",
