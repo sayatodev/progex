@@ -1,132 +1,197 @@
 "use client";
 
-import { RuntimeError } from "@/helpers/calprog/interpreter/Errors";
-import { Interpreter } from "@/helpers/calprog/interpreter/Interpreter";
-import Parser from "@/helpers/calprog/interpreter/Parser";
-import Scanner from "@/helpers/calprog/interpreter/Scanner";
-import { Value } from "@/helpers/calprog/interpreter/Value";
-import { useEffect, useState } from "react";
-import Footer from "../footer";
 import Link from "next/link";
+import { startTransition, useDeferredValue, useEffect, useState } from "react";
+import Footer from "../footer";
+import {
+    buildExampleConfig,
+    DEFAULT_PROGRAM,
+    EXAMPLES,
+} from "./constants";
+import type { ExecutionSnapshot, InterpreterExample } from "./types";
+import {
+    buildSnapshot,
+    formatError,
+    formatProgram,
+    normalizeProgram,
+} from "./runtime";
+import Scanner from "@/helpers/calprog/interpreter/Scanner";
+import type {
+    AngleMode,
+    ExecutionConfig,
+    ExecutionMode,
+    RegressionMode,
+} from "@/helpers/calprog/interpreter/runtime";
+import ExamplesCard from "./components/ExamplesCard";
+import ExecutionCard from "./components/ExecutionCard";
+import InputsCard from "./components/InputsCard";
+import InterpreterHeader from "./components/InterpreterHeader";
+import MemoryCard from "./components/MemoryCard";
+import ProgramEditorCard from "./components/ProgramEditorCard";
+import StatisticsCard from "./components/StatisticsCard";
 
-import styles from "@/app/styles.module.css";
-
-function runProgram(
-    program: string,
-    inputs: string[] = [],
-    displayCallback: (result: Value) => void
-) {
-    console.debug("Parsing", program);
-
-    const tokens = new Scanner(program).scan();
-    console.debug("Tokens", tokens);
-
-    const parser = new Parser(tokens);
-    const statements = parser.parse();
-    console.debug("Expression", statements);
-
-    const interpreter = new Interpreter();
-    interpreter.environment.config({
-        inputs,
-        displayCallback,
-    });
-
-    interpreter.interpret(statements);
-}
-
-export default function DebugPage() {
-    const [program, setProgram] = useState<string>(
-        "?→A:?→B:?→C:?→D:?→X:?→Y:AX-DB→M:(CX-YB)┘M→X◢(AY-DC)┘M→Y"
-    );
+export default function InterpreterPage() {
+    const [program, setProgram] = useState<string>(DEFAULT_PROGRAM);
     const [inputs, setInputs] = useState<string[]>([]);
-    const [results, setResults] = useState<Value[]>([]);
+    const [executionMode, setExecutionMode] = useState<ExecutionMode>("AUTO");
+    const [angleMode, setAngleMode] = useState<AngleMode>("DEG");
+    const [frequencyEnabled, setFrequencyEnabled] = useState(false);
+    const [regressionMode, setRegressionMode] = useState<RegressionMode | "NONE">(
+        "NONE"
+    );
+    const [snapshot, setSnapshot] = useState<ExecutionSnapshot | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    const deferredProgram = useDeferredValue(program);
+    const deferredInputs = useDeferredValue(inputs);
+    const deferredExecutionMode = useDeferredValue(executionMode);
+    const deferredAngleMode = useDeferredValue(angleMode);
+    const deferredFrequencyEnabled = useDeferredValue(frequencyEnabled);
+    const deferredRegressionMode = useDeferredValue(regressionMode);
+
     useEffect(() => {
-        setResults([]); // Clear previous results
-        setError(null); // Clear previous errors
         try {
-            runProgram(
-                program.replaceAll("\n", ""),
-                inputs,
-                (result: Value) => {
-                    setResults((prevResults) => [...prevResults, result]);
-                }
+            const normalizedProgram = normalizeProgram(program);
+            const inputLength = Scanner.getInputLength(
+                new Scanner(normalizedProgram).scan()
             );
-        } catch (error) {
-            if (error instanceof RuntimeError) {
-                setError(
-                    `${error.name}: ${error.message}\n` +
-                        `at Segment ${error.token?.segment ?? "unknown"}` +
-                        `(${error.token?.lexeme})`
-                );
-            } else {
-                setError(`${error}`);
-            }
-        }
-    }, [program, inputs]);
-
-    useEffect(() => {
-        try {
-            const tokens = new Scanner(program.replaceAll("\n", "")).scan();
-            const inputLength = Scanner.getInputLength(tokens);
-
-            setInputs(Array(inputLength).fill(0));
-        } catch (error) {
-            console.warn("Failed to initialize inputs:", error);
+            setInputs((previous) =>
+                Array.from({ length: inputLength }, (_, index) => {
+                    return previous[index] ?? "0";
+                })
+            );
+        } catch {
+            setInputs((previous) => previous);
         }
     }, [program]);
 
+    useEffect(() => {
+        const config: ExecutionConfig = {
+            executionMode: deferredExecutionMode,
+            angleMode: deferredAngleMode,
+            emitFinalResult: true,
+            stats: {
+                frequencyEnabled: deferredFrequencyEnabled,
+                regressionMode:
+                    deferredRegressionMode === "NONE"
+                        ? null
+                        : deferredRegressionMode,
+            },
+        };
+
+        try {
+            const nextSnapshot = buildSnapshot(
+                deferredProgram,
+                deferredInputs,
+                config
+            );
+            startTransition(() => {
+                setSnapshot(nextSnapshot);
+                setError(null);
+            });
+        } catch (caughtError) {
+            startTransition(() => {
+                setSnapshot(null);
+                setError(formatError(caughtError));
+            });
+        }
+    }, [
+        deferredAngleMode,
+        deferredExecutionMode,
+        deferredFrequencyEnabled,
+        deferredInputs,
+        deferredProgram,
+        deferredRegressionMode,
+    ]);
+
+    function handleInputChange(index: number, value: string): void {
+        setInputs((previous) => {
+            const next = [...previous];
+            next[index] = value;
+            return next;
+        });
+    }
+
+    function handleExampleSelect(example: InterpreterExample): void {
+        const nextConfig = buildExampleConfig(example.config);
+        setProgram(example.program);
+        setInputs(example.inputs);
+        setExecutionMode(nextConfig.executionMode);
+        setAngleMode(nextConfig.angleMode);
+        setFrequencyEnabled(nextConfig.frequencyEnabled);
+        setRegressionMode(nextConfig.regressionMode);
+    }
+
+    function handleFormatProgram(): void {
+        setProgram((previous) => formatProgram(previous));
+    }
+
     return (
         <main className="flex min-h-screen flex-col items-center gap-5 p-4 md:p-24">
-            <Link href="/">Back</Link>
-            <h1 className="text-4xl font-bold text-center">
-                Progex Interpreter (Beta)
-            </h1>
+            <div className="w-full max-w-7xl">
+                <Link href="/">Back</Link>
+            </div>
 
-            <div className="flex flex-row w-full flex-wrap mt-4 gap-2">
-                <div className="min-w-full md:min-w-0 flex-7 mt-4 flex flex-col min-h-[25em] bg-white rounded-lg shadow-md p-4 font-mono">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                        Program
-                    </h2>
-                    <textarea
-                        value={program}
-                        onChange={(e) => setProgram(e.target.value)}
-                        className={`${styles.firacode} w-full h-full p-2 border border-gray-300 rounded-md font-mono`}
+            <InterpreterHeader
+                executionMode={snapshot?.executionMode ?? executionMode}
+                angleMode={snapshot?.angleMode ?? angleMode}
+            />
+
+            <ExamplesCard
+                examples={EXAMPLES}
+                onSelect={handleExampleSelect}
+                onFormat={handleFormatProgram}
+            />
+
+            <div className="grid w-full max-w-7xl gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(22rem,0.75fr)]">
+                <ProgramEditorCard
+                    program={program}
+                    tokenCount={snapshot?.tokenCount ?? 0}
+                    executionMode={executionMode}
+                    angleMode={angleMode}
+                    regressionMode={regressionMode}
+                    frequencyEnabled={frequencyEnabled}
+                    onProgramChange={setProgram}
+                    onExecutionModeChange={setExecutionMode}
+                    onAngleModeChange={setAngleMode}
+                    onRegressionModeChange={setRegressionMode}
+                    onFrequencyEnabledChange={setFrequencyEnabled}
+                />
+
+                <div className="grid gap-6">
+                    <InputsCard
+                        inputs={inputs}
+                        inputLabels={snapshot?.inputLabels ?? []}
+                        onInputChange={handleInputChange}
+                    />
+                    <ExecutionCard
+                        error={error}
+                        finalResult={snapshot?.finalResult ?? "0"}
+                        finalResultLabel={snapshot?.finalResultLabel ?? "Ans="}
+                        outputs={snapshot?.outputs ?? []}
+                        outputLabels={snapshot?.outputLabels ?? []}
+                        emitFinalResult={true}
                     />
                 </div>
-                <div className="flex-3 mt-4 max-w-2xl bg-white rounded-lg shadow-md p-4">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                        Inputs
-                    </h2>
-                    {inputs.map((_, index) => (
-                        <input
-                            key={index}
-                            type="text"
-                            value={inputs[index]}
-                            placeholder={`Input ${index + 1}`}
-                            onChange={(e) => {
-                                const newInputs = [...inputs];
-                                newInputs[index] = e.target.value;
-                                setInputs(newInputs);
-                            }}
-                            className="w-full p-2 border border-gray-300 rounded-md mb-2"
-                        />
-                    ))}
-                </div>
-                <div className="min-w-full max-w-2xl bg-white rounded-lg shadow-md p-4 overflow-y-auto h-[25em]">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                        Results
-                    </h2>
-                    <ul className="">
-                        {results.map((result, index) => (
-                            <li key={index} className="mb-2">
-                                {result.toString().replace(/\.?0+$/, "")}
-                            </li>
-                        ))}
-                        {error && <li className="text-red-500">{error}</li>}
-                    </ul>
-                </div>
+            </div>
+
+            <div className="grid w-full max-w-7xl gap-6 lg:grid-cols-2">
+                <MemoryCard
+                    variables={snapshot?.variables ?? []}
+                    remainingInputs={snapshot?.remainingInputs ?? []}
+                />
+                <StatisticsCard
+                    stats={
+                        snapshot?.stats ?? {
+                            frequencyEnabled,
+                            regressionMode:
+                                regressionMode === "NONE"
+                                    ? null
+                                    : regressionMode,
+                            data: [],
+                        }
+                    }
+                />
             </div>
             <Footer />
         </main>

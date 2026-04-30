@@ -4,9 +4,29 @@ import { TokenType } from "./enums";
 import Token, { Literal } from "./Token";
 import type { VariableName, ConstantName } from "./types";
 import { Value } from "./Value";
+
+type KeywordSpec = {
+    text: string;
+    tokenType: TokenType;
+    literal?: Literal;
+};
+
 export default class Scanner {
     private readonly program: string;
     private readonly tokens: Token[] = [];
+    private readonly keywordTokens: KeywordSpec[] = [
+        { text: "ClrMemory", tokenType: TokenType.CLR_MEMORY },
+        { text: "ClrStat", tokenType: TokenType.CLR_STAT },
+        { text: "FreqOn", tokenType: TokenType.FREQ_ON },
+        { text: "DT", tokenType: TokenType.DT },
+        { text: "maxX", tokenType: TokenType.STAT_VARIABLE, literal: "meanX" },
+        { text: "maxY", tokenType: TokenType.STAT_VARIABLE, literal: "meanY" },
+        { text: "x̄", tokenType: TokenType.STAT_VARIABLE, literal: "meanX" },
+        { text: "ȳ", tokenType: TokenType.STAT_VARIABLE, literal: "meanY" },
+        { text: "Σx", tokenType: TokenType.STAT_VARIABLE, literal: "Σx" },
+        { text: "Σy", tokenType: TokenType.STAT_VARIABLE, literal: "Σy" },
+        { text: "n", tokenType: TokenType.STAT_VARIABLE, literal: "n" },
+    ];
     private readonly typesMap = new Map<SymbolValue, TokenType>([
         /* Special symbols */
         [SymbolValue.EXPRESSION, TokenType.EXP],
@@ -160,6 +180,18 @@ export default class Scanner {
 
         if (c === " ") return; // Ignore whitespace
 
+        for (const keyword of this.keywordTokens) {
+            const rest = keyword.text.slice(1);
+            if (
+                c === keyword.text[0] &&
+                this.program.startsWith(rest, this.current)
+            ) {
+                this.current += rest.length;
+                this.addToken(keyword.tokenType, keyword.literal ?? null);
+                return;
+            }
+        }
+
         let matched_symbol: SymbolValue | null = null;
 
         for (let i = MAX_SYMBOL_LENGTH - 1; i >= 0; i--) {
@@ -177,6 +209,23 @@ export default class Scanner {
                 `Unexpected character: ${c + this.peek(4)}`
             );
             return;
+        }
+
+        if (
+            matched_symbol === SymbolValue.M_PLUS ||
+            matched_symbol === SymbolValue.M_MINUS
+        ) {
+            const nextChar = this.peek();
+            const isStandaloneCommand =
+                nextChar === "" || nextChar === ":" || nextChar === "◢" || nextChar === " ";
+
+            if (!isStandaloneCommand) {
+                matched_symbol =
+                    matched_symbol === SymbolValue.M_PLUS
+                        ? SymbolValue.M
+                        : SymbolValue.M;
+                this.current = this.start + 1;
+            }
         }
 
         const tokenType = this.typesMap.get(matched_symbol);

@@ -8,7 +8,7 @@ import type {
     SignedOperator,
     UnaryOperator,
 } from "./types";
-import { Value } from "./Value";
+import { Value, type ComplexValue } from "./Value";
 
 export abstract class Expr {
     abstract accept<R>(visitor: ExprVisitor<R>): R;
@@ -17,6 +17,7 @@ export abstract class Expr {
 
 export interface ExprVisitor<R> {
     visitBinaryExpr(expr: BinaryExpr): R;
+    visitAssignmentExpr(expr: AssignmentExpr): R;
     visitUnaryExpr(expr: UnaryExpr): R;
     visitGroupingExpr(expr: GroupingExpr): R;
     visitExponentialExpr(expr: ExponentialExpr): R;
@@ -25,11 +26,33 @@ export interface ExprVisitor<R> {
     visitVariableExpr(expr: VariableExpr): R;
     visitFunctionCallExpr(expr: FunctionCallExpr): R;
     visitInputExpr(expr: InputExpr): R;
+    visitComplexLiteralExpr(expr: ComplexLiteralExpr): R;
+}
+
+export class AssignmentExpr extends Expr {
+    name: Token<Identifier>;
+    identifier: IdentifierName;
+    value: Expr;
+
+    constructor(name: Token<Identifier>, identifier: IdentifierName, value: Expr) {
+        super();
+        this.name = name;
+        this.identifier = identifier;
+        this.value = value;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitAssignmentExpr(this);
+    }
+
+    toString(): string {
+        return `(Assign ${this.value.toString()} -> ${this.name.lexeme})`;
+    }
 }
 
 export class BinaryExpr extends Expr {
     left: Expr;
-    operator: Token<BinaryOperator> | null; // Null would mean multiplication
+    operator: Token<BinaryOperator> | null;
     right: Expr;
 
     constructor(
@@ -112,6 +135,7 @@ export class GroupingExpr extends Expr {
 export class ExponentialExpr extends Expr {
     factor: Value;
     exponent: Value;
+
     constructor(factor: Value, exponent: Value) {
         super();
         this.factor = factor;
@@ -141,6 +165,23 @@ export class NumberLiteralExpr extends Expr {
 
     toString(): string {
         return `(NumberLiteral ${this.value})`;
+    }
+}
+
+export class ComplexLiteralExpr extends Expr {
+    value: ComplexValue;
+
+    constructor(value: ComplexValue) {
+        super();
+        this.value = value;
+    }
+
+    accept<R>(visitor: ExprVisitor<R>): R {
+        return visitor.visitComplexLiteralExpr(this);
+    }
+
+    toString(): string {
+        return `(ComplexLiteral ${this.value.toString()})`;
     }
 }
 
